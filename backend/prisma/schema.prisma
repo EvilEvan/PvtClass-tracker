@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("TEACHER")
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentSessions Session[] @relation("StudentSessions")
+  teacherSessions Session[] @relation("TeacherSessions")
+  payments        Payment[]
+  assignedStudents Student[] @relation("StudentTeacherAssignments")
+
+  @@map("users")
+}
+
+model Student {
+  id               String   @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String   @unique
+  phone            String
+  dateOfBirth      String
+  enrollmentDate   String
+  status           String   @default("active")
+  subjects         String   // JSON string array
+  notes            String?
+  emergencyContactName String
+  emergencyContactPhone String
+  emergencyContactRelationship String
+  addressStreet    String
+  addressCity      String
+  addressState     String
+  addressZipCode   String
+  assignedTeacherId String?  // Optional teacher assignment
+  assignedTeacher  User?     @relation("StudentTeacherAssignments", fields: [assignedTeacherId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("students")
+}
+
+model Classroom {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  capacity    Int
+  location    String
+  equipment   String   // JSON string array
+  status      String   @default("available")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usageReports ClassroomUsageReport[]
+
+  @@map("classrooms")
+}
+
+model ClassroomUsageReport {
+  id           String    @id @default(cuid())
+  classroomId  String
+  classroom    Classroom @relation(fields: [classroomId], references: [id])
+  sessionId    String?
+  studentName  String
+  subject      String
+  startTime    String
+  endTime      String?
+  status       String    @default("active")
+  reportedBy   String
+  reportedAt   String
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("classroom_usage_reports")
+}
+
+model Session {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  status      String    @default("SCHEDULED")
+  teacherConfirmed Boolean @default(false)
+  teacherNotes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  studentId String
+  student   User   @relation("StudentSessions", fields: [studentId], references: [id])
+  teacherId String
+  teacher   User   @relation("TeacherSessions", fields: [teacherId], references: [id])
+  payment   Payment?
+
+  @@map("sessions")
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  amount    Float
+  currency  String   @default("USD")
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessionId String  @unique
+  session   Session @relation(fields: [sessionId], references: [id])
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+model SystemConfig {
+  id           String @id @default(cuid())
+  masterPassword String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("system_config")
+}
+
+model NotificationSettings {
+  id               String  @id @default(cuid())
+  moderatorEmail   String
+  enableEmailNotifications Boolean @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("notification_settings")
+} 
