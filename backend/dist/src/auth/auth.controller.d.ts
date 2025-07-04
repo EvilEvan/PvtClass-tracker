@@ -7,10 +7,10 @@ export declare class AuthController {
         name: string;
         password: string;
     }): Promise<{
-        id: any;
-        email: any;
-        name: any;
-        role: any;
+        id: string;
+        email: string;
+        name: string;
+        role: string;
         message: string;
     } | {
         error: string;
@@ -21,10 +21,10 @@ export declare class AuthController {
         password: string;
         role: 'TEACHER' | 'MODERATOR' | 'ADMIN';
     }): Promise<{
-        id: any;
-        email: any;
-        name: any;
-        role: any;
+        id: string;
+        email: string;
+        name: string;
+        role: string;
     } | {
         error: string;
     }>;
@@ -38,10 +38,10 @@ export declare class AuthController {
     } | {
         success: boolean;
         user: {
-            id: any;
-            email: any;
-            name: any;
-            role: any;
+            id: string;
+            email: string;
+            name: string;
+            role: string;
         };
         error?: undefined;
     }>;
@@ -59,20 +59,65 @@ export declare class AuthController {
         message: string;
         error?: undefined;
     }>;
-    getAllUsers(): Promise<any>;
-    getTeachers(): Promise<any>;
-    getModerators(): Promise<any>;
+    getAllUsers(): Promise<{
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+        createdAt: Date;
+    }[]>;
+    getTeachers(): Promise<{
+        id: string;
+        email: string;
+        name: string;
+    }[]>;
+    getModerators(): Promise<{
+        id: string;
+        email: string;
+        name: string;
+    }[]>;
     updateUserRole(id: string, body: {
         role: string;
-    }): Promise<any>;
-    deleteUser(id: string): Promise<any>;
+    }): Promise<{
+        id: string;
+        email: string;
+        name: string | null;
+        role: string;
+        password: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    deleteUser(id: string): Promise<{
+        id: string;
+        email: string;
+        name: string | null;
+        role: string;
+        password: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
     checkAdminExists(): Promise<{
-        adminExists: any;
-        totalUsers: any;
-        users: any;
+        adminExists: boolean;
+        totalUsers: number;
+        users: {
+            email: string;
+            role: string;
+        }[];
     }>;
     addModeratorNotification(body: {
         moderatorEmail: string;
-    }): Promise<any>;
-    getNotificationSettings(): Promise<any>;
+    }): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        moderatorEmail: string;
+        enableEmailNotifications: boolean;
+    }>;
+    getNotificationSettings(): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        moderatorEmail: string;
+        enableEmailNotifications: boolean;
+    }[]>;
 }

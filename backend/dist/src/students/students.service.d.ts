@@ -11,12 +11,12 @@ export declare class StudentsService {
     update(id: string, studentData: Partial<Student>): Promise<Student>;
     remove(id: string): Promise<void>;
     getStats(): Promise<{
-        total: any;
-        active: any;
-        inactive: any;
-        suspended: any;
+        total: number;
+        active: number;
+        inactive: number;
+        suspended: number;
         subjectDistribution: {};
-        recentEnrollments: any;
+        recentEnrollments: Student[];
     }>;
     assignTeacher(studentId: string, teacherId: string): Promise<Student>;
     unassignTeacher(studentId: string): Promise<Student>;

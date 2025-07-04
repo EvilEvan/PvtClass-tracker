@@ -44,16 +44,16 @@ export declare class ClassroomsController {
     updateClassroom(id: string, classroomData: Partial<Classroom>): Promise<Classroom>;
     deleteClassroom(id: string): Promise<void>;
     getClassroomStats(): Promise<{
-        totalClassrooms: any;
-        availableClassrooms: any;
-        inUseClassrooms: any;
-        maintenanceClassrooms: any;
+        totalClassrooms: number;
+        availableClassrooms: number;
+        inUseClassrooms: number;
+        maintenanceClassrooms: number;
         todaysUsage: {
-            completed: any;
-            active: any;
-            total: any;
+            completed: number;
+            active: number;
+            total: number;
         };
         utilizationByClassroom: {};
-        recentReports: any;
+        recentReports: ClassroomUsageReport[];
     }>;
 }

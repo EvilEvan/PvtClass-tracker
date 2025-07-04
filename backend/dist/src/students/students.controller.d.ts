@@ -37,12 +37,12 @@ export declare class StudentsController {
     updateStudent(id: string, studentData: Partial<Student>): Promise<Student>;
     deleteStudent(id: string): Promise<void>;
     getStudentStats(): Promise<{
-        total: any;
-        active: any;
-        inactive: any;
-        suspended: any;
+        total: number;
+        active: number;
+        inactive: number;
+        suspended: number;
         subjectDistribution: {};
-        recentEnrollments: any;
+        recentEnrollments: Student[];
     }>;
     assignTeacher(studentId: string, body: {
         teacherId: string;

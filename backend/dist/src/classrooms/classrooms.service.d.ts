@@ -18,16 +18,16 @@ export declare class ClassroomsService {
     }): Promise<ClassroomUsageReport>;
     getUsageReports(date?: string, classroomId?: string): Promise<ClassroomUsageReport[]>;
     getStats(): Promise<{
-        totalClassrooms: any;
-        availableClassrooms: any;
-        inUseClassrooms: any;
-        maintenanceClassrooms: any;
+        totalClassrooms: number;
+        availableClassrooms: number;
+        inUseClassrooms: number;
+        maintenanceClassrooms: number;
         todaysUsage: {
-            completed: any;
-            active: any;
-            total: any;
+            completed: number;
+            active: number;
+            total: number;
         };
         utilizationByClassroom: {};
-        recentReports: any;
+        recentReports: ClassroomUsageReport[];
     }>;
 }
