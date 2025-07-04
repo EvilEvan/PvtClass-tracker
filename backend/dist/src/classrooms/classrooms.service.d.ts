@@ -1,7 +1,8 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { Classroom, ClassroomUsageReport } from './classrooms.controller';
 export declare class ClassroomsService {
     private prisma;
-    constructor();
+    constructor(prisma: PrismaService);
     private seedData;
     private transformClassroom;
     private transformUsageReport;

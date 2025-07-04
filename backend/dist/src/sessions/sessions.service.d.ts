@@ -1,5 +1,7 @@
+import { PrismaService } from '../prisma/prisma.service';
 export declare class SessionsService {
     private prisma;
+    constructor(prisma: PrismaService);
     getAllSessions(): Promise<({
         student: {
             id: string;

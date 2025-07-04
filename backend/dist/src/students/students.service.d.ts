@@ -1,7 +1,8 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { Student } from './students.controller';
 export declare class StudentsService {
     private prisma;
-    constructor();
+    constructor(prisma: PrismaService);
     private seedData;
     private transformStudent;
     findAll(status?: string): Promise<Student[]>;

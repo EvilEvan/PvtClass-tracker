@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  private prisma = new PrismaClient();
+  constructor(private prisma: PrismaService) {}
 
   // Master password for EVAN's override access
   private readonly MASTER_PASSWORD = 'EVAN_MASTER_2025'; // This should be configurable
