@@ -1,7 +1,8 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { Classroom, ClassroomUsageReport } from './classrooms.controller';
 export declare class ClassroomsService {
     private prisma;
-    constructor();
+    constructor(prisma: PrismaService);
     private seedData;
     private transformClassroom;
     private transformUsageReport;
@@ -17,16 +18,16 @@ export declare class ClassroomsService {
     }): Promise<ClassroomUsageReport>;
     getUsageReports(date?: string, classroomId?: string): Promise<ClassroomUsageReport[]>;
     getStats(): Promise<{
-        totalClassrooms: number;
-        availableClassrooms: number;
-        inUseClassrooms: number;
-        maintenanceClassrooms: number;
+        totalClassrooms: any;
+        availableClassrooms: any;
+        inUseClassrooms: any;
+        maintenanceClassrooms: any;
         todaysUsage: {
-            completed: number;
-            active: number;
-            total: number;
+            completed: any;
+            active: any;
+            total: any;
         };
         utilizationByClassroom: {};
-        recentReports: ClassroomUsageReport[];
+        recentReports: any;
     }>;
 }

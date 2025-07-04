@@ -11,10 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudentsService = void 0;
 const common_1 = require("@nestjs/common");
-const client_1 = require("@prisma/client");
+const prisma_service_1 = require("../prisma/prisma.service");
 let StudentsService = class StudentsService {
-    constructor() {
-        this.prisma = new client_1.PrismaClient();
+    constructor(prisma) {
+        this.prisma = prisma;
         this.seedData();
     }
     async seedData() {
@@ -262,6 +262,6 @@ let StudentsService = class StudentsService {
 exports.StudentsService = StudentsService;
 exports.StudentsService = StudentsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], StudentsService);
 //# sourceMappingURL=students.service.js.map

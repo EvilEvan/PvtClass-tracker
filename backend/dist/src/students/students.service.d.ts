@@ -1,7 +1,8 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { Student } from './students.controller';
 export declare class StudentsService {
     private prisma;
-    constructor();
+    constructor(prisma: PrismaService);
     private seedData;
     private transformStudent;
     findAll(status?: string): Promise<Student[]>;
@@ -10,12 +11,12 @@ export declare class StudentsService {
     update(id: string, studentData: Partial<Student>): Promise<Student>;
     remove(id: string): Promise<void>;
     getStats(): Promise<{
-        total: number;
-        active: number;
-        inactive: number;
-        suspended: number;
+        total: any;
+        active: any;
+        inactive: any;
+        suspended: any;
         subjectDistribution: {};
-        recentEnrollments: Student[];
+        recentEnrollments: any;
     }>;
     assignTeacher(studentId: string, teacherId: string): Promise<Student>;
     unassignTeacher(studentId: string): Promise<Student>;
