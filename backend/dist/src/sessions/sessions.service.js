@@ -5,13 +5,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionsService = void 0;
 const common_1 = require("@nestjs/common");
-const client_1 = require("@prisma/client");
+const prisma_service_1 = require("../common/prisma.service");
+const logger_service_1 = require("../common/logger.service");
 let SessionsService = class SessionsService {
-    constructor() {
-        this.prisma = new client_1.PrismaClient();
+    constructor(prisma, logger) {
+        this.prisma = prisma;
+        this.logger = logger;
     }
     async getAllSessions() {
         return this.prisma.session.findMany({
@@ -135,17 +140,8 @@ let SessionsService = class SessionsService {
         const notificationSettings = await this.prisma.notificationSettings.findMany({
             where: { enableEmailNotifications: true },
         });
-        console.log('📧 MODERATOR NOTIFICATION:', {
-            subject: `Teacher Note Added - ${session.title}`,
-            recipients: moderators.map(m => m.email),
-            message: `
-        Teacher: ${session.teacher.name}
-        Student: ${session.student.name}
-        Session: ${session.title}
-        Date: ${session.startTime}
-        Notes: ${notes}
-      `,
-        });
+        this.logger.log(`📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`, 'SessionsService');
+        this.logger.debug(`Recipients: ${moderators.map(m => m.email).join(', ')}`, 'SessionsService');
         return {
             notificationSent: true,
             recipientCount: moderators.length,
@@ -155,6 +151,8 @@ let SessionsService = class SessionsService {
 };
 exports.SessionsService = SessionsService;
 exports.SessionsService = SessionsService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        logger_service_1.AppLogger])
 ], SessionsService);
 //# sourceMappingURL=sessions.service.js.map

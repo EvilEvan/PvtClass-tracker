@@ -8,20 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
 const students_module_1 = require("./students/students.module");
 const classrooms_module_1 = require("./classrooms/classrooms.module");
 const sessions_module_1 = require("./sessions/sessions.module");
+const prisma_service_1 = require("./common/prisma.service");
+const logger_service_1 = require("./common/logger.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule, students_module_1.StudentsModule, classrooms_module_1.ClassroomsModule, sessions_module_1.SessionsModule],
+        imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: '.env',
+            }),
+            auth_module_1.AuthModule,
+            students_module_1.StudentsModule,
+            classrooms_module_1.ClassroomsModule,
+            sessions_module_1.SessionsModule,
+        ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, prisma_service_1.PrismaService, logger_service_1.AppLogger],
+        exports: [prisma_service_1.PrismaService, logger_service_1.AppLogger],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
