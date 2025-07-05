@@ -11,10 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionsService = void 0;
 const common_1 = require("@nestjs/common");
+ cursor/investigate-and-implement-improvements-633d
 const prisma_service_1 = require("../prisma/prisma.service");
 let SessionsService = class SessionsService {
     constructor(prisma) {
         this.prisma = prisma;
+
+const prisma_service_1 = require("../common/prisma.service");
+const logger_service_1 = require("../common/logger.service");
+let SessionsService = class SessionsService {
+    constructor(prisma, logger) {
+        this.prisma = prisma;
+        this.logger = logger;
+ main
     }
     async getAllSessions() {
         return this.prisma.session.findMany({
@@ -138,17 +147,8 @@ let SessionsService = class SessionsService {
         const notificationSettings = await this.prisma.notificationSettings.findMany({
             where: { enableEmailNotifications: true },
         });
-        console.log('📧 MODERATOR NOTIFICATION:', {
-            subject: `Teacher Note Added - ${session.title}`,
-            recipients: moderators.map(m => m.email),
-            message: `
-        Teacher: ${session.teacher.name}
-        Student: ${session.student.name}
-        Session: ${session.title}
-        Date: ${session.startTime}
-        Notes: ${notes}
-      `,
-        });
+        this.logger.log(`📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`, 'SessionsService');
+        this.logger.debug(`Recipients: ${moderators.map(m => m.email).join(', ')}`, 'SessionsService');
         return {
             notificationSent: true,
             recipientCount: moderators.length,
@@ -159,6 +159,11 @@ let SessionsService = class SessionsService {
 exports.SessionsService = SessionsService;
 exports.SessionsService = SessionsService = __decorate([
     (0, common_1.Injectable)(),
+cursor/investigate-and-implement-improvements-633d
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        logger_service_1.AppLogger])
+ main
 ], SessionsService);
 //# sourceMappingURL=sessions.service.js.map
