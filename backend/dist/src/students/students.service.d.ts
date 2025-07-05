@@ -1,10 +1,16 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { Student } from './students.controller';
 import { PrismaService } from '../common/prisma.service';
 import { AppLogger } from '../common/logger.service';
 export declare class StudentsService {
+ cursor/investigate-and-implement-improvements-633d
+    private prisma;
+    constructor(prisma: PrismaService);
+
     private readonly prisma;
     private readonly logger;
     constructor(prisma: PrismaService, logger: AppLogger);
+ main
     private seedData;
     private transformStudent;
     findAll(status?: string): Promise<Student[]>;

@@ -1,4 +1,11 @@
 import { Injectable } from '@nestjs/common';
+ cursor/investigate-and-implement-improvements-633d
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class SessionsService {
+  constructor(private prisma: PrismaService) {}
+
 import { PrismaService } from '../common/prisma.service';
 import { AppLogger } from '../common/logger.service';
 
@@ -8,6 +15,7 @@ export class SessionsService {
     private readonly prisma: PrismaService,
     private readonly logger: AppLogger,
   ) {}
+> main
 
   async getAllSessions() {
     return this.prisma.session.findMany({
@@ -39,7 +47,7 @@ export class SessionsService {
             id: true,
             name: true,
             email: true,
-          },
+          },  
         },
       },
       orderBy: {

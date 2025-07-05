@@ -15,13 +15,20 @@ const auth_module_1 = require("./auth/auth.module");
 const students_module_1 = require("./students/students.module");
 const classrooms_module_1 = require("./classrooms/classrooms.module");
 const sessions_module_1 = require("./sessions/sessions.module");
+ cursor/investigate-and-implement-improvements-633d
+const prisma_module_1 = require("./prisma/prisma.module");
+
 const prisma_service_1 = require("./common/prisma.service");
 const logger_service_1 = require("./common/logger.service");
+ main
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
+cursor/investigate-and-implement-improvements-633d
+        imports: [auth_module_1.AuthModule, students_module_1.StudentsModule, classrooms_module_1.ClassroomsModule, sessions_module_1.SessionsModule, prisma_module_1.PrismaModule],
+
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
@@ -32,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
             classrooms_module_1.ClassroomsModule,
             sessions_module_1.SessionsModule,
         ],
+        main
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService, logger_service_1.AppLogger],
         exports: [prisma_service_1.PrismaService, logger_service_1.AppLogger],
