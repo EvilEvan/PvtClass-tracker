@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../common/prisma.service';
+import { AppLogger } from '../common/logger.service';
 
 @Injectable()
 export class SessionsService {
-  private prisma = new PrismaClient();
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: AppLogger,
+  ) {}
 
   async getAllSessions() {
     return this.prisma.session.findMany({
@@ -158,17 +162,14 @@ export class SessionsService {
 
     // In a real implementation, you would send emails here
     // For now, we'll just log the notification
-    console.log('📧 MODERATOR NOTIFICATION:', {
-      subject: `Teacher Note Added - ${session.title}`,
-      recipients: moderators.map(m => m.email),
-      message: `
-        Teacher: ${session.teacher.name}
-        Student: ${session.student.name}
-        Session: ${session.title}
-        Date: ${session.startTime}
-        Notes: ${notes}
-      `,
-    });
+    this.logger.log(
+      `📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`,
+      'SessionsService'
+    );
+    this.logger.debug(
+      `Recipients: ${moderators.map(m => m.email).join(', ')}`,
+      'SessionsService'
+    );
 
     // Store notification in database for tracking
     // You could add a Notification model to track these

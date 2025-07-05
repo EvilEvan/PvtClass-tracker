@@ -1,7 +1,10 @@
 import { Student } from './students.controller';
+import { PrismaService } from '../common/prisma.service';
+import { AppLogger } from '../common/logger.service';
 export declare class StudentsService {
-    private prisma;
-    constructor();
+    private readonly prisma;
+    private readonly logger;
+    constructor(prisma: PrismaService, logger: AppLogger);
     private seedData;
     private transformStudent;
     findAll(status?: string): Promise<Student[]>;
@@ -10,12 +13,12 @@ export declare class StudentsService {
     update(id: string, studentData: Partial<Student>): Promise<Student>;
     remove(id: string): Promise<void>;
     getStats(): Promise<{
-        total: number;
-        active: number;
-        inactive: number;
-        suspended: number;
+        total: any;
+        active: any;
+        inactive: any;
+        suspended: any;
         subjectDistribution: {};
-        recentEnrollments: Student[];
+        recentEnrollments: any;
     }>;
     assignTeacher(studentId: string, teacherId: string): Promise<Student>;
     unassignTeacher(studentId: string): Promise<Student>;

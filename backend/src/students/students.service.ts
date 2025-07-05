@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { Student } from './students.controller';
+import { PrismaService } from '../common/prisma.service';
+import { AppLogger } from '../common/logger.service';
 
 @Injectable()
 export class StudentsService {
-  private prisma = new PrismaClient();
-
-  constructor() {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: AppLogger,
+  ) {
     this.seedData();
   }
 
