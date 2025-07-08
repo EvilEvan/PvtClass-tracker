@@ -10,7 +10,7 @@ interface DashboardCardProps {
   buttonText: string;
   href?: string;
   onClick?: () => void;
-  variant?: 'default' | 'admin' | 'teacher' | 'warning';
+  variant?: 'primary' | 'admin' | 'teacher' | 'warning';
 }
 
 export const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -20,7 +20,7 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
   buttonText,
   href,
   onClick,
-  variant = 'default'
+  variant = 'primary'
 }) => {
   const content = (
     <Card variant={variant} onClick={onClick}>

@@ -16,7 +16,11 @@ const bcrypt = require("bcrypt");
 let AuthService = class AuthService {
     constructor(prisma) {
         this.prisma = prisma;
-        this.MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'EVAN_MASTER_2025';
+        this.MASTER_PASSWORD = process.env.MASTER_PASSWORD || (() => {
+            console.warn('WARNING: MASTER_PASSWORD environment variable not set. Using default value.');
+            console.warn('For production, set MASTER_PASSWORD environment variable to a secure value.');
+            return 'CHANGE_ME_IN_PRODUCTION';
+        })();
     }
     async createAdminUser(email, name, password) {
         const hashedPassword = await bcrypt.hash(password, 10);
