@@ -123,7 +123,41 @@ Frontend currently needs no env vars, but feel free to add `NEXT_PUBLIC_*` setti
 - **MODERATOR**: Process management, receive notifications, system oversight
 - **TEACHER**: Simple class confirmation interface with optional notes
 
----
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/your-username/pvt-class-tracker.git
+   cd pvt-class-tracker
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install --workspaces
+   ```
+
+3. **Environment Setup**
+   ```bash
+   # Backend environment - SECURITY CRITICAL
+   cd backend
+   cp .env.example .env
+   # Edit .env file and configure your secure credentials
+   # NEVER commit .env files to version control
+   ```
+
+4. **Database Setup**
+   ```bash
+   cd backend
+   npx prisma generate
+   npx prisma db push
+   npx prisma db seed
+   ```
+
+5. **Start Development Servers**
+   ```bash
+   # From project root
+   npm run dev
+   ```
+main
 
 ## 🎨 UI Design System
 
