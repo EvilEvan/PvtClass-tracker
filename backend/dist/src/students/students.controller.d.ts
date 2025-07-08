@@ -76,12 +76,19 @@ export interface Student {
 export declare class StudentsController {
     private readonly studentsService;
     constructor(studentsService: StudentsService);
-    create(createStudentDto: CreateStudentDto): Promise<ApiResponseDto<any>>;
-    findAll(status?: string): Promise<ApiResponseDto<any>>;
-    getStats(): Promise<ApiResponseDto<any>>;
-    findOne(id: string): Promise<ApiResponseDto<any>>;
-    update(id: string, updateStudentDto: UpdateStudentDto): Promise<ApiResponseDto<any>>;
+    create(createStudentDto: CreateStudentDto): Promise<ApiResponseDto<Student>>;
+    findAll(status?: string): Promise<ApiResponseDto<Student[]>>;
+    getStats(): Promise<ApiResponseDto<{
+        total: any;
+        active: any;
+        inactive: any;
+        suspended: any;
+        subjectDistribution: {};
+        recentEnrollments: any;
+    }>>;
+    findOne(id: string): Promise<ApiResponseDto<Student>>;
+    update(id: string, updateStudentDto: UpdateStudentDto): Promise<ApiResponseDto<Student>>;
     remove(id: string): Promise<ApiResponseDto<any>>;
-    assignTeacher(id: string, teacherId: string): Promise<ApiResponseDto<any>>;
-    unassignTeacher(id: string): Promise<ApiResponseDto<any>>;
+    assignTeacher(id: string, teacherId: string): Promise<ApiResponseDto<Student>>;
+    unassignTeacher(id: string): Promise<ApiResponseDto<Student>>;
 }

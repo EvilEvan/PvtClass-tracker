@@ -158,13 +158,11 @@ export class SessionsService {
 
     // In a real implementation, you would send emails here
     // For now, we'll just log the notification
-    this.logger.log(
-      `📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`,
-      'SessionsService'
+    console.log(
+      `📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`
     );
-    this.logger.debug(
-      `Recipients: ${moderators.map(m => m.email).join(', ')}`,
-      'SessionsService'
+    console.log(
+      `Recipients: ${moderators.map(m => m.email).join(', ')}`
     );
 
     // Store notification in database for tracking

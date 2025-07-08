@@ -24,7 +24,13 @@ export declare class SessionsController {
         teacherId: string;
         notes?: string;
     }): Promise<any>;
-    getSessionStats(): Promise<any>;
+    getSessionStats(): Promise<{
+        total: any;
+        completed: any;
+        confirmed: any;
+        withNotes: any;
+        confirmationRate: number;
+    }>;
     getPendingConfirmations(teacherId?: string): Promise<any>;
     getSessionsWithNotes(): Promise<any>;
 }
