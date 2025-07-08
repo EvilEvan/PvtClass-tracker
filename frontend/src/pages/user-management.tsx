@@ -565,7 +565,7 @@ export default function UserManagement() {
               </div>
 
               <p style={{ color: '#b0b7c3', marginBottom: '20px', fontSize: '0.9rem' }}>
-                Enter EVAN's master password to unlock any profile in the system.
+                Enter the system master password to unlock any profile in the system.
               </p>
 
               <form onSubmit={handleMasterUnlock} style={{ display: 'grid', gap: '20px' }}>

@@ -6,8 +6,13 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  // Master password for EVAN's override access (now configurable via env)
-  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'EVAN_MASTER_2025';
+  // Master password for admin override access (configurable via environment)
+  // NOTE: Set MASTER_PASSWORD environment variable for security
+  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || (() => {
+    console.warn('WARNING: MASTER_PASSWORD environment variable not set. Using default value.');
+    console.warn('For production, set MASTER_PASSWORD environment variable to a secure value.');
+    return 'CHANGE_ME_IN_PRODUCTION';
+  })();
 
   async createAdminUser(email: string, name: string, password: string) {
     // Hash the password for security

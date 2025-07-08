@@ -6,14 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { StudentsModule } from './students/students.module';
 import { ClassroomsModule } from './classrooms/classrooms.module';
 import { SessionsModule } from './sessions/sessions.module';
-cursor/investigate-and-implement-improvements-633d
 import { PrismaModule } from './prisma/prisma.module';
-
-@Module({
-  imports: [AuthModule, StudentsModule, ClassroomsModule, SessionsModule, PrismaModule],
-=======
-import { PrismaService } from './common/prisma.service';
-import { AppLogger } from './common/logger.service';
 
 @Module({
   imports: [
@@ -25,10 +18,9 @@ import { AppLogger } from './common/logger.service';
     StudentsModule,
     ClassroomsModule,
     SessionsModule,
+    PrismaModule,
   ],
->main
   controllers: [AppController],
-  providers: [AppService, PrismaService, AppLogger],
-  exports: [PrismaService, AppLogger],
+  providers: [AppService],
 })
 export class AppModule {} 

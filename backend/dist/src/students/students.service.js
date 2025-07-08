@@ -5,27 +5,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudentsService = void 0;
 const common_1 = require("@nestjs/common");
-cursor/investigate-and-implement-improvements-633d
+cursor / investigate - and - implement - improvements - 633;
+d;
 const prisma_service_1 = require("../prisma/prisma.service");
-let StudentsService = class StudentsService {
-    constructor(prisma) {
-        this.prisma = prisma;
-const prisma_service_1 = require("../common/prisma.service");
+main;
 const logger_service_1 = require("../common/logger.service");
 let StudentsService = class StudentsService {
-    constructor(prisma, logger) {
-        this.prisma = prisma;
-        this.logger = logger;
-main
+};
+exports.StudentsService = StudentsService;
+exports.StudentsService = StudentsService = __decorate([
+    (0, common_1.Injectable)()
+], StudentsService);
+/investigate-and-implement-improvements-633d;
+constructor(private, prisma, prisma_service_1.PrismaService);
+{
+    constructor(private, readonly, prisma, prisma_service_1.PrismaService, private, readonly, logger, logger_service_1.AppLogger);
+    {
+        main;
         this.seedData();
     }
-    async seedData() {
+    async;
+    seedData();
+    {
         const count = await this.prisma.student.count();
         if (count === 0) {
             await this.prisma.student.createMany({
@@ -88,7 +92,9 @@ main
             });
         }
     }
-    transformStudent(dbStudent) {
+    transformStudent(dbStudent, any);
+    students_controller_1.Student;
+    {
         return {
             id: dbStudent.id,
             firstName: dbStudent.firstName,
@@ -119,23 +125,29 @@ main
             }
         };
     }
-    async findAll(status) {
-        const students = await this.prisma.student.findMany({
+    async;
+    findAll(status ?  : string);
+    Promise < students_controller_1.Student[] > {
+        const: students = await this.prisma.student.findMany({
             where: status ? { status } : undefined,
-        });
-        return students.map(this.transformStudent);
-    }
-    async findOne(id) {
-        const student = await this.prisma.student.findUnique({
+        }),
+        return: students.map(this.transformStudent)
+    };
+    async;
+    findOne(id, string);
+    Promise < students_controller_1.Student > {
+        const: student = await this.prisma.student.findUnique({
             where: { id },
-        });
-        if (!student) {
+        }),
+        if(, student) {
             throw new common_1.NotFoundException(`Student with ID ${id} not found`);
-        }
-        return this.transformStudent(student);
-    }
-    async create(studentData) {
-        const newStudent = await this.prisma.student.create({
+        },
+        return: this.transformStudent(student)
+    };
+    async;
+    create(studentData, (Omit));
+    Promise < students_controller_1.Student > {
+        const: newStudent = await this.prisma.student.create({
             data: {
                 firstName: studentData.firstName,
                 lastName: studentData.lastName,
@@ -154,127 +166,123 @@ main
                 addressState: studentData.address.state,
                 addressZipCode: studentData.address.zipCode
             }
-        });
-        return this.transformStudent(newStudent);
+        }),
+        return: this.transformStudent(newStudent)
+    };
+    async;
+    update(id, string, studentData, (Partial));
+    Promise < students_controller_1.Student > {
+        const: updateData, any = {},
+        if(studentData) { }, : .firstName, updateData, : .firstName = studentData.firstName,
+        if(studentData) { }, : .lastName, updateData, : .lastName = studentData.lastName,
+        if(studentData) { }, : .email, updateData, : .email = studentData.email,
+        if(studentData) { }, : .phone, updateData, : .phone = studentData.phone,
+        if(studentData) { }, : .dateOfBirth, updateData, : .dateOfBirth = studentData.dateOfBirth,
+        if(studentData) { }, : .enrollmentDate, updateData, : .enrollmentDate = studentData.enrollmentDate,
+        if(studentData) { }, : .status, updateData, : .status = studentData.status,
+        if(studentData) { }, : .subjects, updateData, : .subjects = JSON.stringify(studentData.subjects),
+        if(studentData) { }, : .notes, updateData, : .notes = studentData.notes,
+        if(studentData) { }, : .emergencyContact
+    };
+    {
+        updateData.emergencyContactName = studentData.emergencyContact.name;
+        updateData.emergencyContactPhone = studentData.emergencyContact.phone;
+        updateData.emergencyContactRelationship = studentData.emergencyContact.relationship;
     }
-    async update(id, studentData) {
-        const updateData = {};
-        if (studentData.firstName)
-            updateData.firstName = studentData.firstName;
-        if (studentData.lastName)
-            updateData.lastName = studentData.lastName;
-        if (studentData.email)
-            updateData.email = studentData.email;
-        if (studentData.phone)
-            updateData.phone = studentData.phone;
-        if (studentData.dateOfBirth)
-            updateData.dateOfBirth = studentData.dateOfBirth;
-        if (studentData.enrollmentDate)
-            updateData.enrollmentDate = studentData.enrollmentDate;
-        if (studentData.status)
-            updateData.status = studentData.status;
-        if (studentData.subjects)
-            updateData.subjects = JSON.stringify(studentData.subjects);
-        if (studentData.notes)
-            updateData.notes = studentData.notes;
-        if (studentData.emergencyContact) {
-            updateData.emergencyContactName = studentData.emergencyContact.name;
-            updateData.emergencyContactPhone = studentData.emergencyContact.phone;
-            updateData.emergencyContactRelationship = studentData.emergencyContact.relationship;
-        }
-        if (studentData.address) {
-            updateData.addressStreet = studentData.address.street;
-            updateData.addressCity = studentData.address.city;
-            updateData.addressState = studentData.address.state;
-            updateData.addressZipCode = studentData.address.zipCode;
-        }
-        try {
-            const updatedStudent = await this.prisma.student.update({
-                where: { id },
-                data: updateData
-            });
-            return this.transformStudent(updatedStudent);
-        }
-        catch (error) {
-            throw new common_1.NotFoundException(`Student with ID ${id} not found`);
-        }
+    if (studentData.address) {
+        updateData.addressStreet = studentData.address.street;
+        updateData.addressCity = studentData.address.city;
+        updateData.addressState = studentData.address.state;
+        updateData.addressZipCode = studentData.address.zipCode;
     }
-    async remove(id) {
-        try {
-            await this.prisma.student.delete({
-                where: { id }
-            });
-        }
-        catch (error) {
-            throw new common_1.NotFoundException(`Student with ID ${id} not found`);
-        }
-    }
-    async getStats() {
-        const students = await this.prisma.student.findMany();
-        const total = students.length;
-        const active = students.filter(s => s.status === 'active').length;
-        const inactive = students.filter(s => s.status === 'inactive').length;
-        const suspended = students.filter(s => s.status === 'suspended').length;
-        const subjectCounts = {};
-        students.forEach(student => {
-            const subjects = JSON.parse(student.subjects);
-            subjects.forEach(subject => {
-                subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
-            });
-        });
-        return {
-            total,
-            active,
-            inactive,
-            suspended,
-            subjectDistribution: subjectCounts,
-            recentEnrollments: students
-                .sort((a, b) => new Date(b.enrollmentDate).getTime() - new Date(a.enrollmentDate).getTime())
-                .slice(0, 5)
-                .map(this.transformStudent)
-        };
-    }
-    async assignTeacher(studentId, teacherId) {
-        const teacher = await this.prisma.user.findUnique({
-            where: { id: teacherId }
-        });
-        if (!teacher || teacher.role !== 'TEACHER') {
-            throw new common_1.NotFoundException('Teacher not found or invalid role');
-        }
+    try {
         const updatedStudent = await this.prisma.student.update({
-            where: { id: studentId },
-            data: { assignedTeacherId: teacherId },
+            where: { id },
+            data: updateData
         });
         return this.transformStudent(updatedStudent);
     }
-    async unassignTeacher(studentId) {
-        const updatedStudent = await this.prisma.student.update({
-            where: { id: studentId },
-            data: { assignedTeacherId: null },
-        });
-        return this.transformStudent(updatedStudent);
+    catch (error) {
+        throw new common_1.NotFoundException(`Student with ID ${id} not found`);
     }
-    async findByTeacher(teacherId) {
-        const students = await this.prisma.student.findMany({
-            where: { assignedTeacherId: teacherId },
-        });
-        return students.map(this.transformStudent);
-    }
-    async findUnassigned() {
-        const students = await this.prisma.student.findMany({
-            where: { assignedTeacherId: null },
-        });
-        return students.map(this.transformStudent);
+}
+async;
+remove(id, string);
+Promise < void  > {
+    try: {
+        await, this: .prisma.student.delete({
+            where: { id }
+        })
+    }, catch(error) {
+        throw new common_1.NotFoundException(`Student with ID ${id} not found`);
     }
 };
-exports.StudentsService = StudentsService;
-exports.StudentsService = StudentsService = __decorate([
-    (0, common_1.Injectable)(),
- cursor/investigate-and-implement-improvements-633d
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
-
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        logger_service_1.AppLogger])
- main
-], StudentsService);
+async;
+getStats();
+{
+    const students = await this.prisma.student.findMany();
+    const total = students.length;
+    const active = students.filter(s => s.status === 'active').length;
+    const inactive = students.filter(s => s.status === 'inactive').length;
+    const suspended = students.filter(s => s.status === 'suspended').length;
+    const subjectCounts = {};
+    students.forEach(student => {
+        const subjects = JSON.parse(student.subjects);
+        subjects.forEach(subject => {
+            subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
+        });
+    });
+    return {
+        total,
+        active,
+        inactive,
+        suspended,
+        subjectDistribution: subjectCounts,
+        recentEnrollments: students
+            .sort((a, b) => new Date(b.enrollmentDate).getTime() - new Date(a.enrollmentDate).getTime())
+            .slice(0, 5)
+            .map(this.transformStudent)
+    };
+}
+async;
+assignTeacher(studentId, string, teacherId, string);
+Promise < students_controller_1.Student > {
+    const: teacher = await this.prisma.user.findUnique({
+        where: { id: teacherId }
+    }),
+    if(, teacher) { }
+} || teacher.role !== 'TEACHER';
+{
+    throw new common_1.NotFoundException('Teacher not found or invalid role');
+}
+const updatedStudent = await this.prisma.student.update({
+    where: { id: studentId },
+    data: { assignedTeacherId: teacherId },
+});
+return this.transformStudent(updatedStudent);
+async;
+unassignTeacher(studentId, string);
+Promise < students_controller_1.Student > {
+    const: updatedStudent = await this.prisma.student.update({
+        where: { id: studentId },
+        data: { assignedTeacherId: null },
+    }),
+    return: this.transformStudent(updatedStudent)
+};
+async;
+findByTeacher(teacherId, string);
+Promise < students_controller_1.Student[] > {
+    const: students = await this.prisma.student.findMany({
+        where: { assignedTeacherId: teacherId },
+    }),
+    return: students.map(this.transformStudent)
+};
+async;
+findUnassigned();
+Promise < students_controller_1.Student[] > {
+    const: students = await this.prisma.student.findMany({
+        where: { assignedTeacherId: null },
+    }),
+    return: students.map(this.transformStudent)
+};
 //# sourceMappingURL=students.service.js.map
