@@ -11,7 +11,8 @@ export class SessionsService {
         student: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -33,7 +34,8 @@ export class SessionsService {
         student: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },  
         },

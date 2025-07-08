@@ -29,6 +29,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   teacherSessions Session[] @relation("TeacherSessions")
+  assignedStudents Student[] @relation("AssignedStudents")
   payments        Payment[]
 
   @@map("users")
@@ -47,10 +48,13 @@ model Student {
   notes            String?
   emergencyContactName String
   emergencyContactPhone String
+  emergencyContactRelationship String
   addressStreet    String
   addressCity      String
   addressState     String
   addressZipCode   String
+  assignedTeacherId String?
+  assignedTeacher  User?    @relation("AssignedStudents", fields: [assignedTeacherId], references: [id])
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -70,8 +74,28 @@ model Classroom {
   updatedAt   DateTime @updatedAt
 
   sessions    Session[]
+  usageReports ClassroomUsageReport[]
 
   @@map("classrooms")
+}
+
+model ClassroomUsageReport {
+  id            String   @id @default(cuid())
+  classroomId   String
+  classroom     Classroom @relation(fields: [classroomId], references: [id])
+  sessionId     String?
+  studentName   String
+  subject       String
+  startTime     String
+  endTime       String?
+  status        String   @default("active")
+  reportedBy    String
+  reportedAt    String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("classroom_usage_reports")
 }
 
 model Session {

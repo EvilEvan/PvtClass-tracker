@@ -296,7 +296,7 @@ export class ClassroomsService {
     const completedToday = todaysReports.filter(r => r.status === 'completed').length;
     const activeToday = todaysReports.filter(r => r.status === 'active').length;
     
-    const utilizationByClassroom = {};
+    const utilizationByClassroom: { [key: string]: number } = {};
     classrooms.forEach(classroom => {
       const reports = usageReports.filter(r => r.classroomId === classroom.id);
       utilizationByClassroom[classroom.name] = reports.length;
