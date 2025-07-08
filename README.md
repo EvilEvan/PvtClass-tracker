@@ -90,7 +90,7 @@ FRONTEND_URL=http://localhost:3001
 
 # Security
 JWT_SECRET=super-secret-change-me
-MASTER_PASSWORD=EVAN_MASTER_2025        # admin override, rotate in prod!
+MASTER_PASSWORD=Snotneus69             # placeholder value – set in .env
 
 # Database (Prisma)
 DATABASE_URL="file:./dev.db"
@@ -137,7 +137,7 @@ To simplify private tutoring management through an intuitive, secure, and scalab
 
 ### 👥 User Management System
 - **Three-Tier Role System**: Admin, Moderator, Teacher with distinct permissions
-- **Master Password Override**: Snotneus for emergency access
+- **Master Password Override**: Snotneus69 (placeholder) for emergency access
 - **User Creation Interface**: Admin panel for creating and managing users
 - **Profile Management**: Comprehensive user profiles with contact information
 
@@ -270,7 +270,7 @@ NODE_ENV=development
 
 # Security
 JWT_SECRET="your-jwt-secret-key"
-EVAN_MASTER_PASSWORD="Snotneus"
+EVAN_MASTER_PASSWORD="Snotneus69"
 
 # Email Configuration
 SMTP_HOST="smtp.gmail.com"
@@ -314,7 +314,7 @@ datasource db {
 ### Authentication & Authorization
 - **Role-Based Access Control (RBAC)**: Three-tier permission system
 - **Password Hashing**: bcrypt with salt for secure password storage
-- **Master Password System**: Emergency access with Snotneus
+- **Master Password System**: Emergency access with Snotneus69
 - **Session Management**: Secure session handling with JWT tokens
 - **Input Validation**: Comprehensive validation using class-validator
 
@@ -883,3 +883,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   <p>Built with ❤️ by the Private Students Tracker Team</p>
 </div> 
 main
+
+## 🛡️ Security Best Practices
+
+### Credential Management
+- Never commit real credentials or secrets to version control.
+- Store sensitive values in environment variables or managed secret stores.
+- Rotate secrets regularly and revoke unused credentials.
+
+### Setting Local Credentials
+1. Copy `.env.example` to `.env`.
+2. Replace all placeholder values with your own strong, unique secrets.
+3. Keep `.env` files out of version control (already git-ignored).
+
+### Production Secrets
+- Use secret management services (AWS Secrets Manager, HashiCorp Vault, Vercel/Netlify env settings, etc.).
+- Inject secrets via CI/CD pipelines, orchestration platforms, or environment configuration—never hard-code secrets in the codebase.
+
+> ⚠️  **Never share real passwords in issues, pull requests, or documentation.**
