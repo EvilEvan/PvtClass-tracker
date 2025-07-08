@@ -71,7 +71,7 @@ npm run dev                # root script
 
 Hot-reloading is enabled on code changes for **both** services.
 
----
+
 
 ## ⚙️ Environment Variables
 
@@ -86,7 +86,10 @@ FRONTEND_URL=http://localhost:3001
 
 # Security
 JWT_SECRET=super-secret-change-me
+
+=======
 MASTER_PASSWORD=YOUR_MASTER_PASSWORD_HERE        # admin override, rotate in prod!
+main
 
 # Database (Prisma)
 DATABASE_URL="file:./dev.db"
@@ -98,6 +101,94 @@ DATABASE_URL="file:./dev.db"
 - Use strong, unique passwords for production environments
 
 Frontend currently needs no env vars, but feel free to add `NEXT_PUBLIC_*` settings inside **`frontend/.env.local`**.
+
+ main
+
+## 📑 Table of Contents
+
+- [🎯 Project Overview](#-project-overview)
+- [✨ Key Features](#-key-features)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [⚙️ Configuration](#️-configuration)
+- [🔐 Security Features](#-security-features)
+- [📊 Performance Optimizations](#-performance-optimizations)
+- [🛠️ Development](#️-development)
+- [📁 Project Structure](#-project-structure)
+- [🔧 API Documentation](#-api-documentation)
+- [📈 Database Schema](#-database-schema)
+- [🎨 UI/UX Design](#-uiux-design)
+- [🧪 Testing](#-testing)
+- [🚢 Deployment](#-deployment)
+- [📋 Roadmap](#-roadmap)
+- [🤝 Contributing](#-contributing)
+- [📞 Support](#-support)
+
+## 🎯 Project Overview
+
+The Private Students Tracker Platform is a full-stack web application designed to streamline private tutoring operations. Built with modern technologies and following industry best practices, it provides a comprehensive solution for managing students, sessions, financial tracking, and administrative tasks.
+
+### 🎯 Mission
+To simplify private tutoring management through an intuitive, secure, and scalable platform that enhances the educational experience for both tutors and students.
+
+### 🎯 Target Audience
+- **Private Tutoring Companies**: Multi-tutor organizations requiring centralized management
+- **Independent Tutors**: Solo practitioners needing professional organization tools
+- **Educational Institutions**: Schools offering supplementary tutoring services
+- **Corporate Training**: Companies providing employee education programs
+
+## ✨ Key Features
+
+### 👥 User Management System
+- **Three-Tier Role System**: Admin, Moderator, Teacher with distinct permissions
+- **Master Password Override**: Snotneus69 (placeholder) for emergency access
+- **User Creation Interface**: Admin panel for creating and managing users
+- **Profile Management**: Comprehensive user profiles with contact information
+
+### 📅 Session Management
+- **Interactive Calendar**: Monthly view with color-coded sessions
+- **Session Tracking**: Complete lifecycle from scheduling to completion
+- **Teacher Confirmation**: Simple checkbox interface for class confirmation
+- **Session Statistics**: Real-time analytics and reporting
+- **Status Management**: Scheduled (cyan), Completed (green), Cancelled (red)
+
+### 🎓 Student Registry
+- **Comprehensive Profiles**: Contact info, subjects, emergency contacts
+- **Database Integration**: Full CRUD operations with Prisma ORM
+- **Search & Filter**: Advanced filtering by status, subjects, location
+- **Automatic Seeding**: Sample data for demonstration purposes
+- **Status Tracking**: Active, Inactive, Suspended classifications
+
+### 🏫 Classroom Management
+- **Resource Tracking**: Capacity, location, equipment management
+- **Real-time Status**: Available, In-use, Maintenance states
+- **Usage Analytics**: Historical usage patterns and optimization insights
+- **Equipment Inventory**: Comprehensive equipment tracking per room
+
+### 💰 Financial Operations
+- **Payment Processing**: Integrated billing and payment tracking
+- **Revenue Analytics**: Detailed financial reporting and insights
+- **Automated Invoicing**: Streamlined billing processes
+- **Payment History**: Complete transaction records
+
+### 🔔 Notification System
+- **Email Alerts**: Automated notifications for moderators
+- **Session Reminders**: Automatic reminders for upcoming sessions
+- **System Notifications**: Real-time updates and alerts
+- **Customizable Templates**: Branded email communications
+
+## 🏗️ Architecture
+
+### Frontend Stack
+```
+Next.js 14 + TypeScript + React 18
+├── Server-Side Rendering (SSR)
+├── Static Site Generation (SSG)
+├── Incremental Static Regeneration (ISR)
+├── API Routes
+└── Optimized Image Handling
+```
+main
 
 ---
 
@@ -181,7 +272,10 @@ Professional command center interface with:
 - **Backend API**: http://localhost:8000 (REST API)
 - **API Health Check**: http://localhost:8000/health
 
+```
+=======
 ---
+main
 
 ## 🛠️ Development Commands
 
@@ -211,6 +305,7 @@ npm run
 - **Role-Based Access Control (RBAC)**: Three-tier permission system
 - **Password Hashing**: bcrypt with salt for secure password storage
 - **Master Password System**: Emergency access with configurable master password
+ main
 - **Session Management**: Secure session handling with JWT tokens
 - **Input Validation**: Comprehensive validation using class-validator
 
@@ -381,4 +476,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <div align="center">
   <h3>⭐ Star this repository if you find it helpful!</h3>
   <p>Built with ❤️ by the Private Students Tracker Team</p>
+main
+
+## 🛡️ Security Best Practices
+
+### Credential Management
+- Never commit real credentials or secrets to version control.
+- Store sensitive values in environment variables or managed secret stores.
+- Rotate secrets regularly and revoke unused credentials.
+
+### Setting Local Credentials
+1. Copy `.env.example` to `.env`.
+2. Replace all placeholder values with your own strong, unique secrets.
+3. Keep `.env` files out of version control (already git-ignored).
+
+### Production Secrets
+- Use secret management services (AWS Secrets Manager, HashiCorp Vault, Vercel/Netlify env settings, etc.).
+- Inject secrets via CI/CD pipelines, orchestration platforms, or environment configuration—never hard-code secrets in the codebase.
+
+> ⚠️  **Never share real passwords in issues, pull requests, or documentation.**
+
 </div>
+ main
