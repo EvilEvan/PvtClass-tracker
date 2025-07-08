@@ -9,11 +9,6 @@ import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-<<<<<<< HEAD
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
-=======
   
   // Get logger instance
   const logger = app.get(AppLogger);
@@ -56,5 +51,4 @@ bootstrap();
 bootstrap().catch((error) => {
   console.error('❌ Failed to start application:', error);
   process.exit(1);
-}); 
->>>>>>> 17a341c30a8b80bbf412655f49f618fc9470c52f
+});
