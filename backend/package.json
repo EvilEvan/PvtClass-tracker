@@ -25,12 +25,8 @@
 >>>>>>> 17a341c30a8b80bbf412655f49f618fc9470c52f
   },
   "dependencies": {
-cursor/investigate-and-implement-improvements-633d
     "@nestjs/common": "^10.4.19",
-
-    "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.2",
- main
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
 <<<<<<< HEAD
