@@ -7,7 +7,9 @@ export class AuthService {
   constructor(private prisma: PrismaService) {}
 
   // Master password for EVAN's override access (now configurable via env)
-  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'EVAN_MASTER_2025';
+  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || (() => {
+    throw new Error('MASTER_PASSWORD environment variable is required for security');
+  })();
 
   async createAdminUser(email: string, name: string, password: string) {
     // Hash the password for security

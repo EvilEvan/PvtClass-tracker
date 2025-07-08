@@ -87,7 +87,7 @@
 
 #### Core Requirements Implemented:
 1. **✅ EVAN can create other admins and users** - User Management panel with role creation
-2. **✅ Master password system** - EVAN_MASTER_2025 can unlock any profile
+2. **✅ Master password system** - Environment variable MASTER_PASSWORD can unlock any profile
 3. **✅ Three-tier role system** - ADMIN, MODERATOR, TEACHER (no students in system)
 4. **✅ Teacher interface** - Simple checkbox confirmation with optional notes
 5. **✅ Moderator notifications** - Email alerts when teachers submit notes
@@ -151,7 +151,7 @@
 - Admin authentication system is functional and tested
 - **🎉 Educator satisfaction confirmed - UI design approved!**
 - **🎯 Private Classes Directive successfully implemented!**
-- **🔐 Master password: EVAN_MASTER_2025 (configurable in auth service)**
+- **🔐 Master password: Set via MASTER_PASSWORD environment variable (configurable in auth service)**
 - **✅ Database Architecture:** Complete Prisma schema with proper relationships
 - **✅ Service Layer:** All major services now use database persistence
 
