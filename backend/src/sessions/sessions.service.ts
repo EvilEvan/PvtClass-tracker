@@ -19,7 +19,8 @@ export class SessionsService {
         teacher: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -61,11 +62,6 @@ export class SessionsService {
       },
     });
 
-    // If teacher left notes, notify moderators
-    if (notes && notes.trim().length > 0) {
-      await this.notifyModeratorsOfTeacherNote(session, notes);
-    }
-
     return session;
   }
 
@@ -77,20 +73,34 @@ export class SessionsService {
     studentId: string;
     teacherId: string;
   }) {
+    const { title, description, startTime, endTime, studentId, teacherId } = sessionData;
     return this.prisma.session.create({
-      data: sessionData,
+      data: {
+        title,
+        description,
+        startTime,
+        endTime,
+        student: {
+          connect: { id: studentId }
+        },
+        teacher: {
+          connect: { id: teacherId }
+        }
+      },
       include: {
         student: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
         teacher: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -143,36 +153,6 @@ export class SessionsService {
       confirmed,
       withNotes,
       confirmationRate: total > 0 ? Math.round((confirmed / total) * 100) : 0,
-    };
-  }
-
-  private async notifyModeratorsOfTeacherNote(session: any, notes: string) {
-    // Get all moderators
-    const moderators = await this.prisma.user.findMany({
-      where: { role: 'MODERATOR' },
-      select: { email: true, name: true },
-    });
-
-    // Get notification settings
-    const notificationSettings = await this.prisma.notificationSettings.findMany({
-      where: { enableEmailNotifications: true },
-    });
-
-    // In a real implementation, you would send emails here
-    // For now, we'll just log the notification
-    console.log(
-      `📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`
-    );
-    console.log(
-      `Recipients: ${moderators.map(m => m.email).join(', ')}`
-    );
-
-    // Store notification in database for tracking
-    // You could add a Notification model to track these
-    return { 
-      notificationSent: true, 
-      recipientCount: moderators.length,
-      message: 'Moderators have been notified of teacher note'
     };
   }
 } 
