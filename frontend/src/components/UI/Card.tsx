@@ -2,13 +2,13 @@ import React from 'react';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'admin' | 'teacher' | 'warning';
+  variant?: 'primary' | 'admin' | 'teacher' | 'warning';
   onClick?: () => void;
   className?: string;
 }
 
 const variantStyles = {
-  default: {
+  primary: {
     border: '1px solid #00d4ff',
     boxShadow: '0 0 20px rgba(0, 212, 255, 0.1)',
   },
@@ -28,7 +28,7 @@ const variantStyles = {
 
 export const Card: React.FC<CardProps> = ({ 
   children, 
-  variant = 'default', 
+  variant = 'primary', 
   onClick, 
   className = '' 
 }) => {
