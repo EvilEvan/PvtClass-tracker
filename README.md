@@ -137,7 +137,7 @@ To simplify private tutoring management through an intuitive, secure, and scalab
 
 ### 👥 User Management System
 - **Three-Tier Role System**: Admin, Moderator, Teacher with distinct permissions
-- **Master Password Override**: EVAN_MASTER_2025 for emergency access
+- **Master Password Override**: Snotneus for emergency access
 - **User Creation Interface**: Admin panel for creating and managing users
 - **Profile Management**: Comprehensive user profiles with contact information
 
@@ -270,7 +270,7 @@ NODE_ENV=development
 
 # Security
 JWT_SECRET="your-jwt-secret-key"
-EVAN_MASTER_PASSWORD="EVAN_MASTER_2025"
+EVAN_MASTER_PASSWORD="Snotneus"
 
 # Email Configuration
 SMTP_HOST="smtp.gmail.com"
@@ -314,7 +314,7 @@ datasource db {
 ### Authentication & Authorization
 - **Role-Based Access Control (RBAC)**: Three-tier permission system
 - **Password Hashing**: bcrypt with salt for secure password storage
-- **Master Password System**: Emergency access with EVAN_MASTER_2025
+- **Master Password System**: Emergency access with Snotneus
 - **Session Management**: Secure session handling with JWT tokens
 - **Input Validation**: Comprehensive validation using class-validator
 
