@@ -15,6 +15,9 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showMasterUnlock, setShowMasterUnlock] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -23,6 +26,8 @@ export default function UserManagement() {
   });
   const [masterPassword, setMasterPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState<string>('ALL');
 
   useEffect(() => {
     fetchUsers();
@@ -114,6 +119,91 @@ export default function UserManagement() {
       }
     }
   };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setFormData({
+      email: user.email,
+      name: user.name,
+      password: '',
+      role: user.role as 'TEACHER' | 'MODERATOR' | 'ADMIN'
+    });
+    setShowEditForm(true);
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const updateData: any = {
+        email: formData.email,
+        name: formData.name,
+        role: formData.role,
+      };
+
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+
+      const response = await fetch(`http://localhost:8000/auth/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      const result = await response.json();
+      
+      if (result.error) {
+        setMessage(`Error: ${result.error}`);
+      } else {
+        setMessage(`User ${result.email} updated successfully.`);
+        setFormData({ email: '', name: '', password: '', role: 'TEACHER' });
+        setShowEditForm(false);
+        setEditingUser(null);
+        fetchUsers();
+      }
+    } catch (error) {
+      setMessage('Error: Could not connect to server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (userId: string, userEmail: string) => {
+    const newPassword = prompt('Enter new password for user:');
+    if (!newPassword) return;
+
+    try {
+      const response = await fetch(`http://localhost:8000/auth/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      if (response.ok) {
+        setMessage(`Password reset successfully for ${userEmail}.`);
+      } else {
+        setMessage('Error resetting password.');
+      }
+    } catch (error) {
+      setMessage('Error: Could not reset password.');
+    }
+  };
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filterRole === 'ALL' || user.role === filterRole;
+    return matchesSearch && matchesRole;
+  });
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -241,6 +331,50 @@ export default function UserManagement() {
         </header>
 
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '40px 20px' }}>
+          {/* Search and Filter Controls */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto auto',
+            gap: '20px',
+            marginBottom: '30px',
+            alignItems: 'center'
+          }}>
+            <input
+              type="text"
+              placeholder="Search users by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                padding: '12px',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid #00d4ff',
+                borderRadius: '8px',
+                color: '#e0e6ed',
+                fontSize: '1rem'
+              }}
+            />
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              style={{
+                padding: '12px',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid #00d4ff',
+                borderRadius: '8px',
+                color: '#e0e6ed',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="ALL">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="MODERATOR">Moderator</option>
+              <option value="TEACHER">Teacher</option>
+            </select>
+            <div style={{ color: '#b0b7c3', fontSize: '0.9rem' }}>
+              {filteredUsers.length} of {users.length} users
+            </div>
+          </div>
+
           {/* Stats Dashboard */}
           <div style={{
             display: 'grid',
@@ -301,7 +435,7 @@ export default function UserManagement() {
             display: 'grid',
             gap: '16px'
           }}>
-            {users.map(user => (
+            {filteredUsers.map(user => (
               <div
                 key={user.id}
                 style={{
@@ -348,6 +482,40 @@ export default function UserManagement() {
                   }}>
                     {user.role}
                   </span>
+                  
+                  <button
+                    onClick={() => handleEditUser(user)}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid #00d4ff',
+                      color: '#00d4ff',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      marginRight: '8px'
+                    }}
+                  >
+                    Edit
+                  </button>
+                  
+                  <button
+                    onClick={() => handlePasswordReset(user.id, user.email)}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid #ff9500',
+                      color: '#ff9500',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      marginRight: '8px'
+                    }}
+                  >
+                    Reset Password
+                  </button>
                   
                   <button
                     onClick={() => handleDeleteUser(user.id, user.email)}
@@ -518,6 +686,173 @@ export default function UserManagement() {
                     }}
                   >
                     {loading ? 'Creating...' : 'Create User'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit User Modal */}
+        {showEditForm && editingUser && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}>
+            <div style={{
+              backgroundColor: '#1a2332',
+              border: '1px solid #00d4ff',
+              borderRadius: '12px',
+              padding: '30px',
+              maxWidth: '500px',
+              width: '100%'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <h2 style={{ color: '#00d4ff', margin: 0 }}>Edit User: {editingUser.name}</h2>
+                <button
+                  onClick={() => {
+                    setShowEditForm(false);
+                    setEditingUser(null);
+                    setFormData({ email: '', name: '', password: '', role: 'TEACHER' });
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#00d4ff',
+                    fontSize: '24px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateUser} style={{ display: 'grid', gap: '20px' }}>
+                <div>
+                  <label style={{ color: '#e0e6ed', display: 'block', marginBottom: '8px' }}>Role</label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid #00d4ff',
+                      borderRadius: '8px',
+                      color: '#e0e6ed',
+                      fontSize: '1rem'
+                    }}
+                  >
+                    <option value="TEACHER">👨‍🏫 Teacher</option>
+                    <option value="MODERATOR">🛡️ Moderator</option>
+                    <option value="ADMIN">👑 Administrator</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ color: '#e0e6ed', display: 'block', marginBottom: '8px' }}>Email</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid #00d4ff',
+                      borderRadius: '8px',
+                      color: '#e0e6ed',
+                      fontSize: '1rem'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ color: '#e0e6ed', display: 'block', marginBottom: '8px' }}>Full Name</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid #00d4ff',
+                      borderRadius: '8px',
+                      color: '#e0e6ed',
+                      fontSize: '1rem'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ color: '#e0e6ed', display: 'block', marginBottom: '8px' }}>
+                    New Password (leave blank to keep current)
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid #00d4ff',
+                      borderRadius: '8px',
+                      color: '#e0e6ed',
+                      fontSize: '1rem'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditForm(false);
+                      setEditingUser(null);
+                      setFormData({ email: '', name: '', password: '', role: 'TEACHER' });
+                    }}
+                    style={{
+                      padding: '12px 24px',
+                      backgroundColor: 'transparent',
+                      color: '#b0b7c3',
+                      border: '1px solid #666',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                      padding: '12px 24px',
+                      background: loading ? '#666' : 'linear-gradient(45deg, #00d4ff, #0099cc)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      textTransform: 'uppercase',
+                      fontWeight: '600'
+                    }}
+                  >
+                    {loading ? 'Updating...' : 'Update User'}
                   </button>
                 </div>
               </form>
