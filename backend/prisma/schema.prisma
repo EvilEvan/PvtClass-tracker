@@ -22,23 +22,82 @@ model School {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  password  String
-  role      String // "MODERATOR" or "TEACHER"
-  school    School   @relation(fields: [schoolId], references: [id])
-  schoolId  String
-  bookings  Booking[]
+  name      String?
+  role      String   @default("TEACHER")
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacherSessions Session[] @relation("TeacherSessions")
+  payments        Payment[]
+
+  @@map("users")
 }
 
 model Student {
-  id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  notes     String?
-  school    School   @relation(fields: [schoolId], references: [id])
-  schoolId  String
+  id               String   @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String   @unique
+  phone            String
+  dateOfBirth      String
+  enrollmentDate   String
+  status           String   @default("active")
+  subjects         String   // JSON string array
+  notes            String?
+  emergencyContactName String
+  emergencyContactPhone String
+  addressStreet    String
+  addressCity      String
+  addressState     String
+  addressZipCode   String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sessions         Session[]
+
+  @@map("students")
 }
 
 model Classroom {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  capacity    Int
+  location    String
+  equipment   String   // JSON string array
+  status      String   @default("available")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sessions    Session[]
+
+  @@map("classrooms")
+}
+
+model Session {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  status      String    @default("SCHEDULED")
+  teacherConfirmed Boolean @default(false)
+  teacherNotes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  studentId   String
+  student     Student   @relation(fields: [studentId], references: [id])
+  teacherId   String
+  teacher     User      @relation("TeacherSessions", fields: [teacherId], references: [id])
+  classroomId String?
+  classroom   Classroom? @relation(fields: [classroomId], references: [id])
+  payment     Payment?
+
+  @@map("sessions")
+}
+
+model Payment {
   id        String   @id @default(cuid())
   name      String
   capacity  Int
