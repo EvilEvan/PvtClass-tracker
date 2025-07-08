@@ -1,5 +1,31 @@
 # 🎓 Private Students Tracker Platform
 
+<<<<<<< HEAD
+A comprehensive calendar-based management system for private tutoring operations with professional role-based access control.
+
+## 🎯 Core Features
+
+* **Student Registry Management** - Complete CRUD operations with database integration
+* **Session Control System** - Interactive calendar with teacher confirmation tracking
+* **Classroom Management** - Real-time usage tracking and resource optimization
+* **Special Request Communication** - Priority-based alert system for moderators
+* **Role-Based Access Control** - Three-tier system (Student ▸ Moderator ▸ Admin)
+* **Mobile-Friendly PWA** - Responsive design with Star Wars-inspired professional UI
+
+---
+
+## Getting Started (Local Development)
+
+```bash
+# Install dependencies for both frontend and backend
+npm install --workspaces
+
+# Start both applications concurrently
+npm run dev
+```
+
+The project uses npm workspaces setup (npm v7+). Each package lives under `frontend/` and `backend/`.
+=======
 cursor/enhance-and-optimize-readme-documentation-c18f
 A modern calendar-centric platform that streamlines **private tutoring** administration for solo teachers and small academies.
 
@@ -38,15 +64,87 @@ Key highlights:
 ```
 
 Both apps live in **npm workspaces** so they can be installed & executed together.
+>>>>>>> 17a341c30a8b80bbf412655f49f618fc9470c52f
 
 ---
 
+<<<<<<< HEAD
+- **Frontend**: Next.js React app on http://localhost:3001
+- **Backend**: NestJS API server on http://localhost:8000
+- **Database**: SQLite with Prisma ORM (comprehensive schema with all models)
+- **Authentication**: Role-based system with master password override
+
+### Available Access Points
+
+- **Main Dashboard**: http://localhost:3001 (Welcome page with admin detection)
+- **Moderator Command Center**: http://localhost:3001/moderator-dashboard
+- **Student Registry**: http://localhost:3001/students
+- **Session Control**: http://localhost:3001/sessions
+- **Classroom Management**: http://localhost:3001/classrooms
+- **User Management**: http://localhost:3001/user-management
+- **Backend API**: http://localhost:8000 (REST API)
+- **API Health Check**: http://localhost:8000/health
+
+## 🏗️ Architecture Overview
+
+### Database Models
+- **Users** - Role-based authentication (ADMIN/MODERATOR/TEACHER)
+- **Students** - Comprehensive profiles with contact and emergency info
+- **Classrooms** - Resource tracking with capacity and equipment
+- **Sessions** - Calendar events with teacher confirmation system
+- **Special Request Notes** - Priority communication system
+- **Payments** - Financial tracking (prepared for future use)
+
+### API Endpoints
+- `/auth/*` - Authentication and user management
+- `/students/*` - Student registry CRUD operations
+- `/classrooms/*` - Classroom management and usage tracking
+- `/sessions/*` - Session scheduling and confirmation
+- `/messaging/special-requests/*` - Communication alerts system
+
+### Role-Based Features
+- **ADMIN**: Full system access, user creation, master password override
+- **MODERATOR**: Process management, receive notifications, system oversight
+- **TEACHER**: Simple class confirmation interface with optional notes
+
+## 🚀 Quick Start Commands
+
+```bash
+# Start full system
+npm run dev
+
+# Backend only
+cd backend && npm run dev
+
+# Frontend only  
+cd frontend && npm run dev
+
+# Database operations
+cd backend && npx prisma db push
+cd backend && npx prisma studio
+
+# View available scripts
+npm run
+```
+
+## 🎨 UI Design System
+
+Professional command center interface with:
+- **Dark gradient backgrounds** for reduced eye strain
+- **Cyan accents (#00d4ff)** for primary navigation
+- **Color-coded modules** for different functional areas
+- **Responsive grid layouts** with hover effects
+- **Card-based design** for modular content organization
+
+---
+=======
 ## 3. Requirements
 
 • **Node.js 18+** (LTS recommended)
 • **npm 9+** (ships with Node) – or **pnpm/yarn** if you adapt scripts
 
 > Tip 💡 : use [Volta](https://volta.sh/) or `nvm` to pin Node versions per-project.
+>>>>>>> 17a341c30a8b80bbf412655f49f618fc9470c52f
 
 ---
 
@@ -89,12 +187,17 @@ PORT=8000
 FRONTEND_URL=http://localhost:3001
 
 # Security
-JWT_SECRET=your-jwt-secret-key
-MASTER_PASSWORD=PLACEHOLDER_PASSWORD        # Set your admin override password
+JWT_SECRET=super-secret-change-me
+MASTER_PASSWORD=YOUR_MASTER_PASSWORD_HERE        # admin override, rotate in prod!
 
 # Database (Prisma)
 DATABASE_URL="file:./dev.db"
 ```
+
+**⚠️ IMPORTANT SECURITY NOTE:** 
+- Copy `backend/.env.example` to `backend/.env` and set your own secure passwords
+- Never commit real passwords to version control
+- Use strong, unique passwords for production environments
 
 Frontend currently needs no env vars, but feel free to add `NEXT_PUBLIC_*` settings inside **`frontend/.env.local`**.
 =======
@@ -137,7 +240,7 @@ To simplify private tutoring management through an intuitive, secure, and scalab
 
 ### 👥 User Management System
 - **Three-Tier Role System**: Admin, Moderator, Teacher with distinct permissions
-- **Master Password Override**: Use environment variable for emergency access
+- **Master Password Override**: Emergency access with secure master password
 - **User Creation Interface**: Admin panel for creating and managing users
 - **Profile Management**: Comprehensive user profiles with contact information
 
@@ -232,12 +335,8 @@ SQLite + Prisma ORM
    # Backend environment - SECURITY CRITICAL
    cd backend
    cp .env.example .env
-   
-   # IMPORTANT: Update .env with your actual secure values
-   # - Generate strong JWT secret: openssl rand -base64 32
-   # - Set secure master password (min 20 characters)
-   # - Configure database URL for your environment
-   # - Never commit the .env file to version control
+   # Edit .env file and configure your secure credentials
+   # NEVER commit .env files to version control
    ```
 
 4. **Database Setup**
@@ -275,7 +374,7 @@ NODE_ENV=development
 
 # Security
 JWT_SECRET="your-jwt-secret-key"
-MASTER_PASSWORD="your-master-password"
+MASTER_PASSWORD="YOUR_MASTER_PASSWORD_HERE"
 
 # Email Configuration
 SMTP_HOST="smtp.gmail.com"
@@ -287,6 +386,12 @@ SMTP_PASS="your-app-password"
 RATE_LIMIT_WINDOW=15
 RATE_LIMIT_MAX=100
 ```
+
+**🔒 Security Configuration:**
+- Copy `backend/.env.example` to `backend/.env`
+- Replace placeholder values with your secure credentials
+- Never commit `.env` files to version control
+- Use strong, unique passwords and rotate them regularly
 
 #### Frontend
 ```bash
@@ -319,7 +424,7 @@ datasource db {
 ### Authentication & Authorization
 - **Role-Based Access Control (RBAC)**: Three-tier permission system
 - **Password Hashing**: bcrypt with salt for secure password storage
-- **Master Password System**: Emergency access via environment variable
+- **Master Password System**: Emergency access with configurable master password
 - **Session Management**: Secure session handling with JWT tokens
 - **Input Validation**: Comprehensive validation using class-validator
 
@@ -336,157 +441,38 @@ datasource db {
 - **Data Encryption**: Sensitive data encryption at rest and in transit
 - **Audit Logging**: Comprehensive activity tracking
 
-## � Security Best Practices
+### 🔐 Security Best Practices
 
-### 🚨 Critical Security Requirements
+#### Credential Management
+- **Environment Variables**: Store all sensitive data in environment variables
+- **Strong Passwords**: Use complex passwords with at least 12 characters
+- **Password Rotation**: Regularly update passwords and API keys
+- **No Hardcoding**: Never hardcode credentials in source code
 
-#### Environment Variables & Credentials
-- **NEVER commit real passwords or secrets to version control**
-- **Always use environment variables for sensitive configuration**
-- **Copy `.env.example` to `.env` and update with your actual values**
-- **Use strong, unique passwords (minimum 16 characters)**
-- **Regularly rotate all passwords and API keys**
+#### Development Security
+- **Environment Files**: Keep `.env` files out of version control
+- **Secure Development**: Use HTTPS in production environments
+- **Code Reviews**: Review all code changes for security vulnerabilities
+- **Dependency Updates**: Keep dependencies updated to latest secure versions
 
-#### Password Security Guidelines
+#### Production Security
+- **Environment Separation**: Use different credentials for each environment
+- **Access Control**: Implement principle of least privilege
+- **Monitoring**: Monitor for suspicious activities and failed login attempts
+- **Backup Security**: Secure backup storage with encryption
+
+#### Password Generation
 ```bash
-# Generate secure passwords using:
-openssl rand -base64 32  # For JWT secrets
-openssl rand -base64 24  # For master passwords
+# Generate a secure password using OpenSSL
+openssl rand -base64 32
 
-# Use password managers for strong, unique credentials
-# Examples of strong passwords:
-# JWT_SECRET=K8mN2pQ5rT9xW3zA7bE4cF6gH1jL8mP0sV5yB2nR7qU9
-# MASTER_PASSWORD=SecureP@ssw0rd2024!MasterKey#Admin
-```
-
-#### Production Security Checklist
-- [ ] **Environment Variables**: All secrets stored in environment variables
-- [ ] **Database Security**: Connection strings with authentication
-- [ ] **HTTPS Only**: SSL/TLS certificates properly configured
-- [ ] **Firewall Rules**: Database and admin endpoints protected
-- [ ] **Access Logs**: Comprehensive logging enabled
-- [ ] **Backup Encryption**: Database backups encrypted
-- [ ] **Security Headers**: Helmet.js security headers enabled
-- [ ] **Rate Limiting**: API endpoints protected against abuse
-
-### 🛡️ Secure Development Workflow
-
-#### Before Committing Code
-```bash
-# 1. Check for exposed secrets
-grep -r "password\|secret\|key" --exclude-dir=node_modules .
-
-# 2. Verify .env is gitignored
-git check-ignore .env  # Should return: .env
-
-# 3. Run security linting
-npm audit --audit-level high
-```
-
-#### Environment Setup Security
-```bash
-# 1. Create your .env file from template
-cp backend/.env.example backend/.env
-
-# 2. Update with secure values (use password manager)
-# 3. Verify file permissions (Unix/Linux)
-chmod 600 backend/.env
-
-# 4. Never commit the .env file
-git status  # .env should not appear in staged files
-```
-
-### 🔐 Master Password System
-
-The application includes an emergency master password system for administrative access:
-
-#### Configuration
-```bash
-# In your .env file
-MASTER_PASSWORD=your-extremely-secure-master-password-2024
-
-# Security requirements:
-# - Minimum 20 characters
-# - Mix of uppercase, lowercase, numbers, symbols
-# - Unique to this application
-# - Stored in secure password manager
-# - Rotated every 90 days
-```
-
-#### Usage Guidelines
-- **Emergency Use Only**: Only use when normal admin access fails
-- **Audit Trail**: All master password usage is logged
-- **Immediate Rotation**: Change master password after emergency use
-- **Limited Scope**: Master password grants admin access, not system access
-
-### 🚨 Security Incident Response
-
-#### If Credentials Are Exposed
-1. **Immediate Actions**:
-   - Rotate all exposed credentials immediately
-   - Review git history for leaked secrets
-   - Check deployment logs for unauthorized access
-   - Notify team members if applicable
-
-2. **Investigation**:
-   - Audit recent access logs
-   - Check for suspicious database activity
-   - Review user account changes
-   - Monitor for unusual API usage
-
-3. **Recovery**:
-   - Generate new secure credentials
-   - Update all deployment environments
-   - Force password resets for affected users
-   - Document incident for future prevention
-
-### 📋 Secure Configuration Examples
-
-#### Strong JWT Secret Generation
-```bash
-# Generate a cryptographically secure JWT secret
+# Generate a secure JWT secret
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
-#### Database Security (Production)
-```bash
-# PostgreSQL with SSL
-DATABASE_URL="postgresql://user:password@host:5432/db?sslmode=require"
+**⚠️ SECURITY WARNING:** Never commit real passwords, API keys, or other sensitive credentials to version control. Always use environment variables and secure secret management systems.
 
-# Connection pooling limits
-DATABASE_POOL_MIN=2
-DATABASE_POOL_MAX=10
-DATABASE_TIMEOUT=30000
-```
-
-#### HTTPS Configuration
-```bash
-# Force HTTPS in production
-FORCE_HTTPS=true
-TRUST_PROXY=true
-
-# Security headers
-HSTS_MAX_AGE=31536000
-CSP_POLICY="default-src 'self'; script-src 'self' 'unsafe-inline'"
-```
-
-### ⚠️ Security Warnings
-
-#### Common Vulnerabilities to Avoid
-- **Hardcoded Credentials**: Never embed passwords in code
-- **Weak Master Passwords**: Avoid dictionary words or personal info
-- **Unencrypted Backups**: Always encrypt database backups
-- **Exposed Admin Endpoints**: Protect admin routes with authentication
-- **Insufficient Logging**: Log all authentication and authorization events
-- **Outdated Dependencies**: Regularly update packages with security fixes
-
-#### Development Environment Security
-- Use different credentials for development vs production
-- Regularly clear development databases of production data
-- Use VPN when accessing production systems
-- Enable 2FA on all service accounts (GitHub, cloud providers, etc.)
-
-## �📊 Performance Optimizations
+## 📊 Performance Optimizations
 
 ### Frontend Optimizations
 

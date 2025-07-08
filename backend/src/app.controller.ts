@@ -9,9 +9,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
-  @Get('health')
-  getHealth(): object {
-    return { status: 'ok', message: 'Private Class Tracker API is running' };
-  }
-} 
+}

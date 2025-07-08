@@ -32,7 +32,7 @@ export default function SessionModal({
     description: '',
     startTime: '',
     endTime: '',
-    status: 'SCHEDULED' as const,
+    status: 'SCHEDULED' as 'SCHEDULED' | 'COMPLETED' | 'CANCELLED',
     studentName: ''
   });
   const [loading, setLoading] = useState(false);
