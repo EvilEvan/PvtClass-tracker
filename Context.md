@@ -8,7 +8,7 @@ To develop a professional, secure, and highly efficient management platform for 
 
 ## 🎯 Current Vision & Strategy
 
-<<<<<<< HEAD
+HEAD
 The platform is evolving from a local-only prototype into a production-ready, cloud-deployable application. The immediate focus is on overhauling the user authentication experience to be more intuitive, secure, and professional.
 =======
 #### Core Requirements Implemented:
@@ -19,7 +19,7 @@ The platform is evolving from a local-only prototype into a production-ready, cl
 5. **✅ Moderator notifications** - Email alerts when teachers submit notes
 6. **✅ No assignment features** - Content entirely at discretion of parents/teachers
 7. **✅ Plug-and-play for teachers** - Streamlined interface focused on class tracking
->>>>>>> bd5110fa1510d1f667d7394358477caff65b8eb5
+bd5110fa1510d1f667d7394358477caff65b8eb5
 
 ### Key Strategic Pillars:
 
@@ -39,11 +39,6 @@ The platform is evolving from a local-only prototype into a production-ready, cl
     *   **Problem**: Hardcoded `localhost` URLs and development-specific settings prevent easy deployment.
     *   **Solution**: The codebase has been refactored to use environment variables (`.env`) for all external URLs and sensitive configurations. This allows for seamless switching between local development and a live production environment on platforms like Vercel and Render.
 
----
-
-<<<<<<< HEAD
-## 🛠️ Current Development State
-=======
 - Repository uses npm workspaces for mono-repo management
 - TypeScript v5+ across the entire stack
 - Backend runs on port 8000, frontend on port 3001
@@ -55,7 +50,7 @@ The platform is evolving from a local-only prototype into a production-ready, cl
 - **🔐 Master password: Configurable via environment variables (see .env.example)**
 - **✅ Database Architecture:** Complete Prisma schema with proper relationships
 - **✅ Service Layer:** All major services now use database persistence
->>>>>>> bd5110fa1510d1f667d7394358477caff65b8eb5
+bd5110fa1510d1f667d7394358477caff65b8eb5
 
 The application is in a transitional phase, moving from feature implementation to architectural refinement and user experience enhancement.
 

@@ -332,7 +332,7 @@ SQLite + Prisma ORM
 
 3. **Environment Setup**
    ```bash
-   # Backend environment
+   # Backend environment - SECURITY CRITICAL
    cd backend
    cp .env.example .env
    # Edit .env file and configure your secure credentials
