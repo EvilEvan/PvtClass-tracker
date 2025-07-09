@@ -88,10 +88,7 @@ FRONTEND_URL=http://localhost:3001
 
 # Security
 JWT_SECRET=super-secret-change-me
-
-=======
 MASTER_PASSWORD=YOUR_MASTER_PASSWORD_HERE        # admin override, rotate in prod!
-main
 
 # Database (Prisma)
 DATABASE_URL="file:./dev.db"
