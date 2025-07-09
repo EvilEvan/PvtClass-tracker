@@ -9,22 +9,24 @@ import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Get logger instance
   const logger = app.get(AppLogger);
   app.useLogger(logger);
 
   // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          scriptSrc: ["'self'"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+        },
       },
-    },
-  }));
+    }),
+  );
 
   // Compression
   app.use(compression());
@@ -44,8 +46,11 @@ async function bootstrap() {
 
   const port = process.env.PORT || 8000;
   await app.listen(port);
-  
-  logger.log(`🚀 Backend server running on http://localhost:${port}`, 'Bootstrap');
+
+  logger.log(
+    `🚀 Backend server running on http://localhost:${port}`,
+    'Bootstrap',
+  );
 }
 
 bootstrap().catch((error) => {

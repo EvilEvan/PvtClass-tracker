@@ -1,7 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { ApiResponseDto } from '../common/dto/api-response.dto';
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsArray, IsIn } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsArray,
+  IsIn,
+} from 'class-validator';
 
 // DTOs for validation
 export class CreateStudentDto {
@@ -160,7 +178,10 @@ export class StudentsController {
   @Get('stats')
   async getStats() {
     const stats = await this.studentsService.getStats();
-    return ApiResponseDto.success(stats, 'Student statistics retrieved successfully');
+    return ApiResponseDto.success(
+      stats,
+      'Student statistics retrieved successfully',
+    );
   }
 
   @Get(':id')
@@ -170,7 +191,10 @@ export class StudentsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateStudentDto: UpdateStudentDto,
+  ) {
     const student = await this.studentsService.update(id, updateStudentDto);
     return ApiResponseDto.success(student, 'Student updated successfully');
   }
@@ -183,7 +207,10 @@ export class StudentsController {
   }
 
   @Post(':id/assign-teacher')
-  async assignTeacher(@Param('id') id: string, @Body('teacherId') teacherId: string) {
+  async assignTeacher(
+    @Param('id') id: string,
+    @Body('teacherId') teacherId: string,
+  ) {
     const student = await this.studentsService.assignTeacher(id, teacherId);
     return ApiResponseDto.success(student, 'Teacher assigned successfully');
   }
@@ -193,4 +220,4 @@ export class StudentsController {
     const student = await this.studentsService.unassignTeacher(id);
     return ApiResponseDto.success(student, 'Teacher unassigned successfully');
   }
-} 
+}

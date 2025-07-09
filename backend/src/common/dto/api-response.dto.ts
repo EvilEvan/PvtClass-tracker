@@ -28,7 +28,13 @@ export class PaginatedResponseDto<T> extends ApiResponseDto<T[]> {
   limit: number;
   totalPages: number;
 
-  constructor(data: T[], total: number, page: number, limit: number, message?: string) {
+  constructor(
+    data: T[],
+    total: number,
+    page: number,
+    limit: number,
+    message?: string,
+  ) {
     super(data, message);
     this.total = total;
     this.page = page;
