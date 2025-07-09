@@ -8,16 +8,27 @@ export class AuthService {
 
   // Master password for admin override access (configurable via environment)
   // NOTE: Set MASTER_PASSWORD environment variable for security
-  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || (() => {
-    console.warn('WARNING: MASTER_PASSWORD environment variable not set. Using default value.');
-    console.warn('For production, set MASTER_PASSWORD environment variable to a secure value.');
-    return 'CHANGE_ME_IN_PRODUCTION';
-  })();
+  private readonly MASTER_PASSWORD =
+    process.env.MASTER_PASSWORD ||
+    (() => {
+      console.warn(
+        'WARNING: MASTER_PASSWORD environment variable not set. Using default value.',
+      );
+      console.warn(
+        'For production, set MASTER_PASSWORD environment variable to a secure value.',
+      );
+      return 'CHANGE_ME_IN_PRODUCTION';
+    })();
 
-  async createAdminUser(email: string, firstName: string, lastName: string, password: string) {
+  async createAdminUser(
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+  ) {
     // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     let school = await this.prisma.school.findFirst();
     if (!school) {
       school = await this.prisma.school.create({
@@ -57,7 +68,9 @@ export class AuthService {
     schoolId: string,
   ) {
     // Ensure the referenced school exists to avoid foreign key violations
-    const school = await this.prisma.school.findUnique({ where: { id: schoolId } });
+    const school = await this.prisma.school.findUnique({
+      where: { id: schoolId },
+    });
     if (!school) {
       throw new NotFoundException(`School with ID ${schoolId} not found`);
     }
@@ -95,7 +108,7 @@ export class AuthService {
     }
 
     // Check regular password
-    if (user.password && await bcrypt.compare(password, user.password)) {
+    if (user.password && (await bcrypt.compare(password, user.password))) {
       return user;
     }
 
@@ -161,4 +174,4 @@ export class AuthService {
       },
     });
   }
-} 
+}

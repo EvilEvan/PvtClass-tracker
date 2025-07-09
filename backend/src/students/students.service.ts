@@ -58,8 +58,13 @@ export class StudentsService {
             dateOfBirth: '2005-03-15',
             enrollmentDate: '2024-09-01',
             status: 'active',
-            subjects: JSON.stringify(['Mathematics', 'Physics', 'Computer Science']),
-            notes: 'Exceptional student with strong analytical skills. Shows great potential in STEM subjects.',
+            subjects: JSON.stringify([
+              'Mathematics',
+              'Physics',
+              'Computer Science',
+            ]),
+            notes:
+              'Exceptional student with strong analytical skills. Shows great potential in STEM subjects.',
             emergencyContactName: 'Owen Lars',
             emergencyContactPhone: '+1-555-0102',
             emergencyContactRelationship: 'Uncle',
@@ -77,8 +82,13 @@ export class StudentsService {
             dateOfBirth: '2005-03-15',
             enrollmentDate: '2024-09-01',
             status: 'active',
-            subjects: JSON.stringify(['Literature', 'History', 'Political Science']),
-            notes: 'Natural leader with excellent communication skills. Particularly strong in humanities.',
+            subjects: JSON.stringify([
+              'Literature',
+              'History',
+              'Political Science',
+            ]),
+            notes:
+              'Natural leader with excellent communication skills. Particularly strong in humanities.',
             emergencyContactName: 'Bail Organa',
             emergencyContactPhone: '+1-555-0202',
             emergencyContactRelationship: 'Father',
@@ -97,7 +107,8 @@ export class StudentsService {
             enrollmentDate: '2024-10-15',
             status: 'active',
             subjects: JSON.stringify(['Business', 'Engineering', 'Economics']),
-            notes: 'Independent learner with practical approach to problem-solving. Sometimes needs motivation.',
+            notes:
+              'Independent learner with practical approach to problem-solving. Sometimes needs motivation.',
             emergencyContactName: 'Chewbacca',
             emergencyContactPhone: '+1-555-0302',
             emergencyContactRelationship: 'Friend',
@@ -106,8 +117,8 @@ export class StudentsService {
             addressState: 'TX',
             addressZipCode: '75001',
             schoolId,
-          }
-        ]
+          },
+        ],
       });
     }
   }
@@ -125,23 +136,25 @@ export class StudentsService {
       subjects: JSON.parse(dbStudent.subjects),
       notes: dbStudent.notes || '',
       assignedTeacherId: dbStudent.assignedTeacherId,
-      assignedTeacher: dbStudent.assignedTeacher ? {
-        id: dbStudent.assignedTeacher.id,
-        firstName: dbStudent.assignedTeacher.firstName,
-        lastName: dbStudent.assignedTeacher.lastName,
-        email: dbStudent.assignedTeacher.email
-      } : undefined,
+      assignedTeacher: dbStudent.assignedTeacher
+        ? {
+            id: dbStudent.assignedTeacher.id,
+            firstName: dbStudent.assignedTeacher.firstName,
+            lastName: dbStudent.assignedTeacher.lastName,
+            email: dbStudent.assignedTeacher.email,
+          }
+        : undefined,
       emergencyContact: {
         name: dbStudent.emergencyContactName,
         phone: dbStudent.emergencyContactPhone,
-        relationship: dbStudent.emergencyContactRelationship
+        relationship: dbStudent.emergencyContactRelationship,
       },
       address: {
         street: dbStudent.addressStreet,
         city: dbStudent.addressCity,
         state: dbStudent.addressState,
-        zipCode: dbStudent.addressZipCode
-      }
+        zipCode: dbStudent.addressZipCode,
+      },
     };
   }
 
@@ -154,10 +167,10 @@ export class StudentsService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
     return students.map(this.transformStudent);
   }
@@ -171,10 +184,10 @@ export class StudentsService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
     if (!student) {
       throw new NotFoundException(`Student with ID ${id} not found`);
@@ -182,13 +195,18 @@ export class StudentsService {
     return this.transformStudent(student);
   }
 
-  async create(studentData: Omit<Student, 'id'>, schoolId?: string): Promise<Student> {
+  async create(
+    studentData: Omit<Student, 'id'>,
+    schoolId?: string,
+  ): Promise<Student> {
     // Resolve schoolId: use provided one or fall back to default school
     let resolvedSchoolId = schoolId;
     if (!resolvedSchoolId) {
       let school = await this.prisma.school.findFirst();
       if (!school) {
-        school = await this.prisma.school.create({ data: { name: 'Default School' } });
+        school = await this.prisma.school.create({
+          data: { name: 'Default School' },
+        });
       }
       resolvedSchoolId = school.id;
     }
@@ -212,27 +230,31 @@ export class StudentsService {
         addressState: studentData.address.state,
         addressZipCode: studentData.address.zipCode,
         schoolId: resolvedSchoolId,
-      }
+      },
     });
     return this.transformStudent(newStudent);
   }
 
   async update(id: string, studentData: Partial<Student>): Promise<Student> {
     const updateData: any = {};
-    
+
     if (studentData.firstName) updateData.firstName = studentData.firstName;
     if (studentData.lastName) updateData.lastName = studentData.lastName;
     if (studentData.email) updateData.email = studentData.email;
     if (studentData.phone) updateData.phone = studentData.phone;
-    if (studentData.dateOfBirth) updateData.dateOfBirth = studentData.dateOfBirth;
-    if (studentData.enrollmentDate) updateData.enrollmentDate = studentData.enrollmentDate;
+    if (studentData.dateOfBirth)
+      updateData.dateOfBirth = studentData.dateOfBirth;
+    if (studentData.enrollmentDate)
+      updateData.enrollmentDate = studentData.enrollmentDate;
     if (studentData.status) updateData.status = studentData.status;
-    if (studentData.subjects) updateData.subjects = JSON.stringify(studentData.subjects);
+    if (studentData.subjects)
+      updateData.subjects = JSON.stringify(studentData.subjects);
     if (studentData.notes) updateData.notes = studentData.notes;
     if (studentData.emergencyContact) {
       updateData.emergencyContactName = studentData.emergencyContact.name;
       updateData.emergencyContactPhone = studentData.emergencyContact.phone;
-      updateData.emergencyContactRelationship = studentData.emergencyContact.relationship;
+      updateData.emergencyContactRelationship =
+        studentData.emergencyContact.relationship;
     }
     if (studentData.address) {
       updateData.addressStreet = studentData.address.street;
@@ -244,7 +266,7 @@ export class StudentsService {
     try {
       const updatedStudent = await this.prisma.student.update({
         where: { id },
-        data: updateData
+        data: updateData,
       });
       return this.transformStudent(updatedStudent);
     } catch (error) {
@@ -255,7 +277,7 @@ export class StudentsService {
   async remove(id: string): Promise<void> {
     try {
       await this.prisma.student.delete({
-        where: { id }
+        where: { id },
       });
     } catch (error) {
       throw new NotFoundException(`Student with ID ${id} not found`);
@@ -264,16 +286,16 @@ export class StudentsService {
 
   async getStats() {
     const students = await this.prisma.student.findMany();
-    
+
     const total = students.length;
-    const active = students.filter(s => s.status === 'active').length;
-    const inactive = students.filter(s => s.status === 'inactive').length;
-    const suspended = students.filter(s => s.status === 'suspended').length;
-    
+    const active = students.filter((s) => s.status === 'active').length;
+    const inactive = students.filter((s) => s.status === 'inactive').length;
+    const suspended = students.filter((s) => s.status === 'suspended').length;
+
     const subjectCounts = {};
-    students.forEach(student => {
+    students.forEach((student) => {
       const subjects = JSON.parse(student.subjects);
-      subjects.forEach(subject => {
+      subjects.forEach((subject) => {
         subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
       });
     });
@@ -285,9 +307,13 @@ export class StudentsService {
       suspended,
       subjectDistribution: subjectCounts,
       recentEnrollments: students
-        .sort((a, b) => new Date(b.enrollmentDate).getTime() - new Date(a.enrollmentDate).getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.enrollmentDate).getTime() -
+            new Date(a.enrollmentDate).getTime(),
+        )
         .slice(0, 5)
-        .map(this.transformStudent)
+        .map(this.transformStudent),
     };
   }
 
@@ -295,9 +321,9 @@ export class StudentsService {
   async assignTeacher(studentId: string, teacherId: string): Promise<Student> {
     // Verify teacher exists and has TEACHER role
     const teacher = await this.prisma.user.findUnique({
-      where: { id: teacherId }
+      where: { id: teacherId },
     });
-    
+
     if (!teacher || teacher.role !== 'TEACHER') {
       throw new NotFoundException('Teacher not found or invalid role');
     }
@@ -311,10 +337,10 @@ export class StudentsService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     return this.transformStudent(updatedStudent);
@@ -330,10 +356,10 @@ export class StudentsService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     return this.transformStudent(updatedStudent);
@@ -348,10 +374,10 @@ export class StudentsService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     return students.map(this.transformStudent);
@@ -366,12 +392,12 @@ export class StudentsService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     return students.map(this.transformStudent);
   }
-} 
+}

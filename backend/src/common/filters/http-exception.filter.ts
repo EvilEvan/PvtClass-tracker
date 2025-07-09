@@ -1,4 +1,10 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ApiResponseDto } from '../dto/api-response.dto';
 import { AppLogger } from '../logger.service';
@@ -19,13 +25,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      
+
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         const responseObj = exceptionResponse as any;
         message = responseObj.message || 'An error occurred';
-        
+
         if (Array.isArray(responseObj.message)) {
           errors = responseObj.message;
           message = 'Validation failed';
@@ -43,12 +52,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     this.logger.error(
       `${request.method} ${request.url} - ${status} - ${message}`,
       exception instanceof Error ? exception.stack : undefined,
-      'ExceptionFilter'
+      'ExceptionFilter',
     );
 
     // Send standardized error response
     const errorResponse = ApiResponseDto.error(message, errors);
-    
+
     response.status(status).json(errorResponse);
   }
 }
