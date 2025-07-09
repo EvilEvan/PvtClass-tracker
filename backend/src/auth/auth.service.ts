@@ -6,51 +6,68 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  // Master password for EVAN's override access (now configurable via env)
-  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'EVAN_MASTER_2025';
+  // Master password for admin override access (configurable via environment)
+  // NOTE: Set MASTER_PASSWORD environment variable for security
+  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || (() => {
+    console.warn('WARNING: MASTER_PASSWORD environment variable not set. Using default value.');
+    console.warn('For production, set MASTER_PASSWORD environment variable to a secure value.');
+    return 'CHANGE_ME_IN_PRODUCTION';
+  })();
 
-  async createAdminUser(email: string, name: string, password: string) {
+  async createAdminUser(email: string, firstName: string, lastName: string, password: string) {
     // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    let school = await this.prisma.school.findFirst();
+    if (!school) {
+      school = await this.prisma.school.create({
+        data: {
+          name: 'Default School',
+        },
+      });
+    }
+
     const adminUser = await this.prisma.user.create({
       data: {
         email,
-        name,
+        firstName,
+        lastName,
         role: 'ADMIN',
         password: hashedPassword,
+        schoolId: school.id,
       },
     });
-
-    // Initialize system config with master password if not exists
-    await this.initializeSystemConfig();
 
     return {
       id: adminUser.id,
       email: adminUser.email,
-      name: adminUser.name,
+      firstName: adminUser.firstName,
+      lastName: adminUser.lastName,
       role: adminUser.role,
       message: `Admin user created successfully`,
     };
   }
 
-  async createUser(email: string, name: string, password: string, role: 'TEACHER' | 'MODERATOR' | 'ADMIN') {
+  async createUser(email: string, firstName: string, lastName: string, password: string, role: 'TEACHER' | 'MODERATOR' | 'ADMIN', schoolId: string) {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
     
     const user = await this.prisma.user.create({
       data: {
         email,
-        name,
+        firstName,
+        lastName,
         role,
         password: hashedPassword,
+        schoolId,
       },
     });
 
     return {
       id: user.id,
       email: user.email,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       role: user.role,
     };
   }
@@ -87,7 +104,8 @@ export class AuthService {
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
         role: true,
         createdAt: true,
       },
@@ -113,7 +131,8 @@ export class AuthService {
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
       },
     });
   }
@@ -124,33 +143,9 @@ export class AuthService {
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
       },
     });
-  }
-
-  private async initializeSystemConfig() {
-    const existingConfig = await this.prisma.systemConfig.findFirst();
-    if (!existingConfig) {
-      const hashedMasterPassword = await bcrypt.hash(this.MASTER_PASSWORD, 10);
-      await this.prisma.systemConfig.create({
-        data: {
-          masterPassword: hashedMasterPassword,
-        },
-      });
-    }
-  }
-
-  async addModeratorNotification(moderatorEmail: string) {
-    return this.prisma.notificationSettings.create({
-      data: {
-        moderatorEmail,
-        enableEmailNotifications: true,
-      },
-    });
-  }
-
-  async getNotificationSettings() {
-    return this.prisma.notificationSettings.findMany();
   }
 } 

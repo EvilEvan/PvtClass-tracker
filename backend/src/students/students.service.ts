@@ -1,28 +1,53 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
- cursor/investigate-and-implement-improvements-633d
 import { PrismaService } from '../prisma/prisma.service';
- main
-import { Student } from './students.controller';
-import { PrismaService } from '../common/prisma.service';
-import { AppLogger } from '../common/logger.service';
+
+export interface Student {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  enrollmentDate: string;
+  status: string;
+  subjects: string[];
+  notes?: string;
+  assignedTeacherId?: string;
+  assignedTeacher?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  emergencyContact: {
+    name: string;
+    phone: string;
+    relationship: string;
+  };
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+}
 
 @Injectable()
 export class StudentsService {
- cursor/investigate-and-implement-improvements-633d
   constructor(private prisma: PrismaService) {
-
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly logger: AppLogger,
-  ) {
- main
     this.seedData();
   }
 
   private async seedData() {
-    // Check if data exists, if not, seed with sample data
     const count = await this.prisma.student.count();
     if (count === 0) {
+      let school = await this.prisma.school.findFirst();
+      if (!school) {
+        school = await this.prisma.school.create({
+          data: { name: 'Default School' },
+        });
+      }
+      const schoolId = school.id;
       await this.prisma.student.createMany({
         data: [
           {
@@ -41,7 +66,8 @@ export class StudentsService {
             addressStreet: '123 Tatooine Drive',
             addressCity: 'Desert Springs',
             addressState: 'AZ',
-            addressZipCode: '85001'
+            addressZipCode: '85001',
+            schoolId,
           },
           {
             firstName: 'Leia',
@@ -59,7 +85,8 @@ export class StudentsService {
             addressStreet: '456 Royal Avenue',
             addressCity: 'Capital City',
             addressState: 'DC',
-            addressZipCode: '20001'
+            addressZipCode: '20001',
+            schoolId,
           },
           {
             firstName: 'Han',
@@ -77,7 +104,8 @@ export class StudentsService {
             addressStreet: '789 Millennium Lane',
             addressCity: 'Corellia',
             addressState: 'TX',
-            addressZipCode: '75001'
+            addressZipCode: '75001',
+            schoolId,
           }
         ]
       });
@@ -99,7 +127,8 @@ export class StudentsService {
       assignedTeacherId: dbStudent.assignedTeacherId,
       assignedTeacher: dbStudent.assignedTeacher ? {
         id: dbStudent.assignedTeacher.id,
-        name: dbStudent.assignedTeacher.name,
+        firstName: dbStudent.assignedTeacher.firstName,
+        lastName: dbStudent.assignedTeacher.lastName,
         email: dbStudent.assignedTeacher.email
       } : undefined,
       emergencyContact: {
@@ -119,15 +148,16 @@ export class StudentsService {
   async findAll(status?: string): Promise<Student[]> {
     const students = await this.prisma.student.findMany({
       where: status ? { status } : undefined,
-      // include: {
-      //   assignedTeacher: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true
-      //     }
-      //   }
-      // }
+      include: {
+        assignedTeacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
     });
     return students.map(this.transformStudent);
   }
@@ -135,15 +165,16 @@ export class StudentsService {
   async findOne(id: string): Promise<Student> {
     const student = await this.prisma.student.findUnique({
       where: { id },
-      // include: {
-      //   assignedTeacher: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true
-      //     }
-      //   }
-      // }
+      include: {
+        assignedTeacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
     });
     if (!student) {
       throw new NotFoundException(`Student with ID ${id} not found`);
@@ -151,7 +182,7 @@ export class StudentsService {
     return this.transformStudent(student);
   }
 
-  async create(studentData: Omit<Student, 'id'>): Promise<Student> {
+  async create(studentData: Omit<Student, 'id'>, schoolId: string): Promise<Student> {
     const newStudent = await this.prisma.student.create({
       data: {
         firstName: studentData.firstName,
@@ -169,7 +200,8 @@ export class StudentsService {
         addressStreet: studentData.address.street,
         addressCity: studentData.address.city,
         addressState: studentData.address.state,
-        addressZipCode: studentData.address.zipCode
+        addressZipCode: studentData.address.zipCode,
+        schoolId,
       }
     });
     return this.transformStudent(newStudent);
@@ -263,15 +295,16 @@ export class StudentsService {
     const updatedStudent = await this.prisma.student.update({
       where: { id: studentId },
       data: { assignedTeacherId: teacherId },
-      // include: {
-      //   assignedTeacher: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true
-      //     }
-      //   }
-      // }
+      include: {
+        assignedTeacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
     });
 
     return this.transformStudent(updatedStudent);
@@ -281,15 +314,16 @@ export class StudentsService {
     const updatedStudent = await this.prisma.student.update({
       where: { id: studentId },
       data: { assignedTeacherId: null },
-      // include: {
-      //   assignedTeacher: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true
-      //     }
-      //   }
-      // }
+      include: {
+        assignedTeacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
     });
 
     return this.transformStudent(updatedStudent);
@@ -298,15 +332,16 @@ export class StudentsService {
   async findByTeacher(teacherId: string): Promise<Student[]> {
     const students = await this.prisma.student.findMany({
       where: { assignedTeacherId: teacherId },
-      // include: {
-      //   assignedTeacher: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true
-      //     }
-      //   }
-      // }
+      include: {
+        assignedTeacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
     });
 
     return students.map(this.transformStudent);
@@ -315,15 +350,16 @@ export class StudentsService {
   async findUnassigned(): Promise<Student[]> {
     const students = await this.prisma.student.findMany({
       where: { assignedTeacherId: null },
-      // include: {
-      //   assignedTeacher: {
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true
-      //     }
-      //   }
-      // }
+      include: {
+        assignedTeacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
     });
 
     return students.map(this.transformStudent);

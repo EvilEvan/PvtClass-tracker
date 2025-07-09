@@ -13,7 +13,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status: number;
-    let message: string;
+    let message: string = 'An error occurred';
     let errors: string[] = [];
 
     if (exception instanceof HttpException) {

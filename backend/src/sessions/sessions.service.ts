@@ -1,21 +1,9 @@
 import { Injectable } from '@nestjs/common';
- cursor/investigate-and-implement-improvements-633d
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SessionsService {
   constructor(private prisma: PrismaService) {}
-
-import { PrismaService } from '../common/prisma.service';
-import { AppLogger } from '../common/logger.service';
-
-@Injectable()
-export class SessionsService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly logger: AppLogger,
-  ) {}
-> main
 
   async getAllSessions() {
     return this.prisma.session.findMany({
@@ -23,14 +11,16 @@ export class SessionsService {
         student: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
         teacher: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -45,7 +35,8 @@ export class SessionsService {
         student: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },  
         },
@@ -71,11 +62,6 @@ export class SessionsService {
       },
     });
 
-    // If teacher left notes, notify moderators
-    if (notes && notes.trim().length > 0) {
-      await this.notifyModeratorsOfTeacherNote(session, notes);
-    }
-
     return session;
   }
 
@@ -87,20 +73,34 @@ export class SessionsService {
     studentId: string;
     teacherId: string;
   }) {
+    const { title, description, startTime, endTime, studentId, teacherId } = sessionData;
     return this.prisma.session.create({
-      data: sessionData,
+      data: {
+        title,
+        description,
+        startTime,
+        endTime,
+        student: {
+          connect: { id: studentId }
+        },
+        teacher: {
+          connect: { id: teacherId }
+        }
+      },
       include: {
         student: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
         teacher: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -153,38 +153,6 @@ export class SessionsService {
       confirmed,
       withNotes,
       confirmationRate: total > 0 ? Math.round((confirmed / total) * 100) : 0,
-    };
-  }
-
-  private async notifyModeratorsOfTeacherNote(session: any, notes: string) {
-    // Get all moderators
-    const moderators = await this.prisma.user.findMany({
-      where: { role: 'MODERATOR' },
-      select: { email: true, name: true },
-    });
-
-    // Get notification settings
-    const notificationSettings = await this.prisma.notificationSettings.findMany({
-      where: { enableEmailNotifications: true },
-    });
-
-    // In a real implementation, you would send emails here
-    // For now, we'll just log the notification
-    this.logger.log(
-      `📧 MODERATOR NOTIFICATION: Teacher Note Added - ${session.title}`,
-      'SessionsService'
-    );
-    this.logger.debug(
-      `Recipients: ${moderators.map(m => m.email).join(', ')}`,
-      'SessionsService'
-    );
-
-    // Store notification in database for tracking
-    // You could add a Notification model to track these
-    return { 
-      notificationSent: true, 
-      recipientCount: moderators.length,
-      message: 'Moderators have been notified of teacher note'
     };
   }
 } 

@@ -1,23 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model School {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+  students Student[]
+  classrooms Classroom[]
 }
 
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
+  firstName String
+  lastName  String
   role      String   @default("TEACHER")
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  school    School   @relation(fields: [schoolId], references: [id])
+  schoolId  String
+
   teacherSessions Session[] @relation("TeacherSessions")
-  payments        Payment[]
+  assignedStudents Student[] @relation("AssignedStudents")
 
   @@map("users")
 }
@@ -35,14 +51,19 @@ model Student {
   notes            String?
   emergencyContactName String
   emergencyContactPhone String
+  emergencyContactRelationship String
   addressStreet    String
   addressCity      String
   addressState     String
   addressZipCode   String
+  assignedTeacherId String?
+  assignedTeacher  User?    @relation("AssignedStudents", fields: [assignedTeacherId], references: [id])
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  sessions         Session[]
+  school      School     @relation(fields: [schoolId], references: [id])
+  schoolId    String
+  sessions    Session[]
 
   @@map("students")
 }
@@ -57,9 +78,31 @@ model Classroom {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  school      School    @relation(fields: [schoolId], references: [id])
+  schoolId    String
   sessions    Session[]
+  usageReports ClassroomUsageReport[]
 
   @@map("classrooms")
+}
+
+model ClassroomUsageReport {
+  id            String   @id @default(cuid())
+  classroomId   String
+  classroom     Classroom @relation(fields: [classroomId], references: [id])
+  sessionId     String?
+  studentName   String
+  subject       String
+  startTime     String
+  endTime       String?
+  status        String   @default("active")
+  reportedBy    String
+  reportedAt    String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("classroom_usage_reports")
 }
 
 model Session {
@@ -80,42 +123,6 @@ model Session {
   teacher     User      @relation("TeacherSessions", fields: [teacherId], references: [id])
   classroomId String?
   classroom   Classroom? @relation(fields: [classroomId], references: [id])
-  payment     Payment?
 
   @@map("sessions")
 }
-
-model Payment {
-  id        String   @id @default(cuid())
-  amount    Float
-  currency  String   @default("USD")
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sessionId String  @unique
-  session   Session @relation(fields: [sessionId], references: [id])
-  userId    String
-  user      User    @relation(fields: [userId], references: [id])
-
-  @@map("payments")
-}
-
-model SystemConfig {
-  id           String @id @default(cuid())
-  masterPassword String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("system_config")
-}
-
-model NotificationSettings {
-  id               String  @id @default(cuid())
-  moderatorEmail   String
-  enableEmailNotifications Boolean @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@map("notification_settings")
-} 
