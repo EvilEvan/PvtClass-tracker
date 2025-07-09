@@ -1,6 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Classroom, ClassroomUsageReport } from './classrooms.controller';
+
+export interface Classroom {
+  id: string;
+  name: string;
+  capacity: number;
+  location: string;
+  equipment: string[];
+  status: string;
+  currentSession?: {
+    sessionId: string;
+    studentName: string;
+    subject: string;
+    startTime: string;
+    endTime: string;
+    reportedBy: string;
+  };
+}
+
+export interface ClassroomUsageReport {
+  id: string;
+  classroomId: string;
+  classroomName: string;
+  sessionId?: string;
+  studentName: string;
+  subject: string;
+  startTime: string;
+  endTime?: string;
+  status: string;
+  reportedBy: string;
+  reportedAt: string;
+  notes?: string;
+}
 
 @Injectable()
 export class ClassroomsService {
@@ -12,6 +43,13 @@ export class ClassroomsService {
     // Check if data exists, if not, seed with sample data
     const classroomCount = await this.prisma.classroom.count();
     if (classroomCount === 0) {
+      let school = await this.prisma.school.findFirst();
+      if (!school) {
+        school = await this.prisma.school.create({
+          data: { name: 'Default School' },
+        });
+      }
+      const schoolId = school.id;
       await this.prisma.classroom.createMany({
         data: [
           {
@@ -19,28 +57,32 @@ export class ClassroomsService {
             capacity: 8,
             location: 'Level 1 - Main Deck',
             equipment: JSON.stringify(['Interactive Whiteboard', 'Projector', 'Sound System', 'Video Conferencing']),
-            status: 'available'
+            status: 'available',
+            schoolId: schoolId,
           },
           {
             name: 'Jedi Council Chamber',
             capacity: 12,
             location: 'Level 2 - East Wing',
             equipment: JSON.stringify(['Holographic Display', 'Surround Sound', 'Climate Control', 'Recording Equipment']),
-            status: 'available'
+            status: 'available',
+            schoolId: schoolId,
           },
           {
             name: 'Rebel Base Conference',
             capacity: 6,
             location: 'Level 1 - West Wing',
             equipment: JSON.stringify(['Smart Board', 'Tablets', 'Wireless Presentation', 'Coffee Station']),
-            status: 'available'
+            status: 'available',
+            schoolId: schoolId,
           },
           {
             name: 'Death Star Briefing Room',
             capacity: 15,
             location: 'Level 3 - Central',
             equipment: JSON.stringify(['Large Screen Display', 'Microphone System', 'Document Camera', 'Lighting Controls']),
-            status: 'maintenance'
+            status: 'maintenance',
+            schoolId: schoolId,
           }
         ]
       });
@@ -161,14 +203,15 @@ export class ClassroomsService {
     return this.transformClassroom(classroom, classroom.usageReports[0]);
   }
 
-  async create(classroomData: Omit<Classroom, 'id' | 'currentSession'>): Promise<Classroom> {
+  async create(classroomData: Omit<Classroom, 'id' | 'currentSession'>, schoolId: string): Promise<Classroom> {
     const newClassroom = await this.prisma.classroom.create({
       data: {
         name: classroomData.name,
         capacity: classroomData.capacity,
         location: classroomData.location,
         equipment: JSON.stringify(classroomData.equipment),
-        status: classroomData.status || 'available'
+        status: classroomData.status || 'available',
+        schoolId: schoolId,
       }
     });
 
@@ -296,7 +339,7 @@ export class ClassroomsService {
     const completedToday = todaysReports.filter(r => r.status === 'completed').length;
     const activeToday = todaysReports.filter(r => r.status === 'active').length;
     
-    const utilizationByClassroom = {};
+    const utilizationByClassroom: { [key: string]: number } = {};
     classrooms.forEach(classroom => {
       const reports = usageReports.filter(r => r.classroomId === classroom.id);
       utilizationByClassroom[classroom.name] = reports.length;

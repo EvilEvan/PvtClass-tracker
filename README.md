@@ -2,6 +2,8 @@
 
 A modern calendar-centric platform that streamlines **private tutoring** administration for solo teachers and small academies.
 
+cursor/remove-exposed-passwords-from-readme-2db2
+=======
 ## 🎯 Key Features
 
 • 📅 **Session & Calendar Management** – Create, edit and visualize student sessions on an intuitive timetable  
@@ -103,6 +105,7 @@ DATABASE_URL="file:./dev.db"
 Frontend currently needs no env vars, but feel free to add `NEXT_PUBLIC_*` settings inside **`frontend/.env.local`**.
 
  main
+
 
 ## 📑 Table of Contents
 
@@ -209,10 +212,18 @@ main
 - `/sessions/*` - Session scheduling and confirmation
 - `/messaging/special-requests/*` - Communication alerts system
 
+
+### Prerequisites
+- **Node.js**: v18+ (LTS recommended)
+- **npm**: v9+ (for workspace support)
+- **Git**: For version control
+- **VS Code**: Recommended IDE with TypeScript support
+=======
 ### Role-Based Features
 - **ADMIN**: Full system access, user creation, master password override
 - **MODERATOR**: Process management, receive notifications, system oversight
 - **TEACHER**: Simple class confirmation interface with optional notes
+main
 
 
 1. **Clone the Repository**
@@ -237,10 +248,11 @@ main
 
 4. **Database Setup**
    ```bash
+   # From the backend directory
    cd backend
    npx prisma generate
    npx prisma db push
-   npx prisma db seed
+   npx prisma db seed # Optional: for demo data
    ```
 
 5. **Start Development Servers**
@@ -324,7 +336,35 @@ npm run
 - **Next.js 14 Features**: Turbopack for 70% faster builds
 - **Server Components**: Reduced client-side JavaScript
 - **Image Optimization**: Automatic WebP/AVIF conversion
-- **Code Splitting**: Route-level chunks and lazy loading
+- 
+- **Font Optimization**: next/font for performance
+
+```typescript
+// Optimized Image Component
+import Image from 'next/image'
+
+<Image
+  src="/hero-image.jpg"
+  alt="Hero Banner"
+  width={1200}
+  height={600}
+  priority
+  sizes="(max-width: 768px) 100vw, 50vw"
+/>
+```
+
+#### Code Splitting & Lazy Loading
+```typescript
+// Dynamic imports for components
+import dynamic from 'next/dynamic'
+
+const DynamicCalendar = dynamic(() => import('../components/Calendar'), {
+  loading: () => <p>Loading...</p>,
+  ssr: false
+})
+```
+
+ main
 
 ### Backend Optimizations
 - **Database Optimization**: Efficient Prisma queries with proper indexing
@@ -332,7 +372,233 @@ npm run
 - **Rate Limiting**: Prevents API abuse and maintains performance
 - **Lazy Loading**: On-demand data fetching
 
----
+### Core Web Vitals Optimization
+- **Largest Contentful Paint (LCP)**: < 2.5s
+- **First Input Delay (FID)**: < 100ms  
+- **Cumulative Layout Shift (CLS)**: < 0.1
+- **First Contentful Paint (FCP)**: < 1.8s
+
+## 🛠️ Development
+
+### Available Scripts
+
+#### Root Level
+```bash
+npm run dev          # Start both frontend and backend
+npm run build        # Build both applications
+npm run start        # Start production servers
+npm run lint         # Lint all workspaces
+```
+
+#### Frontend (Next.js)
+```bash
+cd frontend
+npm run dev          # Development server on port 3001
+npm run build        # Production build
+npm run start        # Production server
+npm run lint         # ESLint checks
+```
+
+#### Backend (NestJS)
+```bash
+cd backend
+npm run dev          # Development server with hot reload
+npm run build        # Production build
+npm run start        # Production server
+npm run lint         # ESLint checks
+npm run test         # Run tests
+```
+
+### Development Workflow
+
+1. **Feature Development**
+   - Create feature branch from `main`
+   - Implement changes with proper testing
+   - Run linting and tests locally
+   - Submit pull request with detailed description
+
+2. **Database Changes**
+   ```bash
+   # From the backend directory
+   cd backend
+   # Create migration
+   npx prisma migrate dev --name your_migration_name
+   
+   # Reset database (development only)
+   npx prisma migrate reset
+   
+   # Generate client
+   npx prisma generate
+   ```
+
+3. **Code Quality**
+   - TypeScript for type safety
+   - ESLint for code quality
+   - Prettier for code formatting
+   - Husky for pre-commit hooks
+
+## 📁 Project Structure
+
+```
+private-students-tracker/
+├── 📁 frontend/                 # Next.js frontend application
+│   ├── 📁 src/
+│   │   ├── 📁 components/      # Reusable UI components
+│   │   ├── 📁 pages/           # Next.js pages
+│   │   ├── 📁 hooks/           # Custom React hooks
+│   │   ├── 📁 utils/           # Utility functions
+│   │   └── 📁 types/           # TypeScript type definitions
+│   ├── 📁 public/              # Static assets
+│   └── 📄 next.config.js       # Next.js configuration
+├── 📁 backend/                  # NestJS backend application
+│   ├── 📁 src/
+│   │   ├── 📁 modules/         # Feature modules
+│   │   │   ├── 📁 auth/        # Authentication module
+│   │   │   ├── 📁 users/       # User management
+│   │   │   ├── 📁 students/    # Student management
+│   │   │   ├── 📁 sessions/    # Session management
+│   │   │   └── 📁 classrooms/  # Classroom management
+│   │   ├── 📁 common/          # Shared utilities
+│   │   ├── 📁 database/        # Database configuration
+│   │   └── 📄 main.ts          # Application entry point
+│   ├── 📁 prisma/              # Database schema and migrations
+│   └── 📄 nest-cli.json        # NestJS CLI configuration
+├── 📁 docs/                    # Documentation files
+├── 📁 scripts/                 # Build and deployment scripts
+├── 📄 package.json             # Root package configuration
+├── 📄 README.md                # This file
+└── 📄 .gitignore               # Git ignore rules
+```
+
+## 🔧 API Documentation
+
+### Authentication Endpoints
+```typescript
+POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/refresh
+POST /api/auth/logout
+```
+
+### User Management
+```typescript
+GET    /api/users           # Get all users
+GET    /api/users/:id       # Get user by ID
+POST   /api/users           # Create new user
+PUT    /api/users/:id       # Update user
+DELETE /api/users/:id       # Delete user
+```
+
+### Student Management
+```typescript
+GET    /api/students        # Get all students
+GET    /api/students/:id    # Get student by ID
+POST   /api/students        # Create new student
+PUT    /api/au/students/:id    # Update student
+DELETE /api/students/:id    # Delete student
+```
+
+### Session Management
+```typescript
+GET    /api/sessions        # Get all sessions
+GET    /api/sessions/:id    # Get session by ID
+POST   /api/sessions        # Create new session
+PUT    /api/sessions/:id    # Update session
+DELETE /api/sessions/:id    # Delete session
+PUT    /api/sessions/:id/confirm # Confirm session
+```
+
+### Classroom Management
+```typescript
+GET    /api/classrooms      # Get all classrooms
+GET    /api/classrooms/:id  # Get classroom by ID
+POST   /api/classrooms      # Create new classroom
+PUT    /api/classrooms/:id  # Update classroom
+DELETE /api/classrooms/:id  # Delete classroom
+```
+
+## 📈 Database Schema
+
+### Core Models
+
+#### User Model
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(TEACHER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions  Session[]
+}
+```
+
+#### Student Model
+```prisma
+model Student {
+  id                Int      @id @default(autoincrement())
+  firstName         String
+  lastName          String
+  email             String?  @unique
+  phone             String?
+  address           String?
+  subjects          String[]
+  status            StudentStatus @default(ACTIVE)
+  emergencyContact  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  sessions          Session[]
+}
+```
+
+#### Session Model
+```prisma
+model Session {
+  id                Int      @id @default(autoincrement())
+  title             String
+  description       String?
+  startTime         DateTime
+  endTime           DateTime
+  status            SessionStatus @default(SCHEDULED)
+  teacherConfirmed  Boolean  @default(false)
+  teacherNotes      String?
+  studentId         Int
+  teacherId         Int
+  classroomId       Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  student           Student   @relation(fields: [studentId], references: [id])
+  teacher           User      @relation(fields: [teacherId], references: [id])
+  classroom         Classroom? @relation(fields: [classroomId], references: [id])
+}
+```
+
+## 🎨 UI/UX Design
+
+### Design System
+- **Theme**: Star Wars-inspired professional interface
+- **Color Palette**: 
+  - Primary: #00d4ff (Cyan)
+  - Secondary: #1a1a1a (Dark Gray)
+  - Accent: #ffffff (White)
+  - Success: #10b981 (Green)
+  - Warning: #f59e0b (Orange)
+  - Error: #ef4444 (Red)
+
+### Component Library
+- **Reusable Components**: Button, Card, Input, Modal, Table
+- **Layout Components**: Header, Sidebar, Footer, Grid
+- **Data Components**: Calendar, Charts, Statistics
+- **Form Components**: Validated forms with real-time feedback
+
+### Responsive Design
+- **Mobile-First**: Optimized for mobile devices
+- **Tablet Support**: Enhanced tablet experience
+- **Desktop**: Full-featured desktop interface
+- **Accessibility**: WCAG 2.1 AA compliance
 
 ## 🧪 Testing
 
@@ -401,20 +667,13 @@ SMTP_PASS=your-smtp-password
 - [x] Basic reporting and analytics
 
 ### Phase 2: Enhanced Features 🚧
-- [ ] Advanced analytics and reporting
-- [ ] Email notifications and reminders
+
 - [ ] Mobile app (React Native)
-- [ ] Payment processing integration
-- [ ] Multi-language support
 
-### Phase 3: Enterprise Features 🔮
-- [ ] Multi-tenant architecture
-- [ ] Advanced role management
-- [ ] API rate limiting and quotas
-- [ ] Audit logging and compliance
-- [ ] Advanced security features
 
----
+
+
+
 
 ## 🤝 Contributing
 
@@ -434,7 +693,7 @@ SMTP_PASS=your-smtp-password
 
 **Port Already in Use**
 ```bash
-# Kill processes on ports 3001 and 8000
+# Kill processes on ports 3001 and 8000 on macOS/Linux
 lsof -ti:3001,8000 | xargs kill -9
 ```
 
@@ -471,11 +730,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Prisma Team**: For the excellent ORM and database tools
 - **Open Source Community**: For inspiration and contributions
 
----
 
 <div align="center">
   <h3>⭐ Star this repository if you find it helpful!</h3>
   <p>Built with ❤️ by the Private Students Tracker Team</p>
+
+</div>
+
 main
 
 ## 🛡️ Security Best Practices
@@ -498,3 +759,4 @@ main
 
 </div>
  main
+

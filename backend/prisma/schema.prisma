@@ -22,14 +22,18 @@ model School {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
+  firstName String
+  lastName  String
   role      String   @default("TEACHER")
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  school    School   @relation(fields: [schoolId], references: [id])
+  schoolId  String
+
   teacherSessions Session[] @relation("TeacherSessions")
-  payments        Payment[]
+  assignedStudents Student[] @relation("AssignedStudents")
 
   @@map("users")
 }
@@ -47,14 +51,19 @@ model Student {
   notes            String?
   emergencyContactName String
   emergencyContactPhone String
+  emergencyContactRelationship String
   addressStreet    String
   addressCity      String
   addressState     String
   addressZipCode   String
+  assignedTeacherId String?
+  assignedTeacher  User?    @relation("AssignedStudents", fields: [assignedTeacherId], references: [id])
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  sessions         Session[]
+  school      School     @relation(fields: [schoolId], references: [id])
+  schoolId    String
+  sessions    Session[]
 
   @@map("students")
 }
@@ -69,9 +78,31 @@ model Classroom {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  school      School    @relation(fields: [schoolId], references: [id])
+  schoolId    String
   sessions    Session[]
+  usageReports ClassroomUsageReport[]
 
   @@map("classrooms")
+}
+
+model ClassroomUsageReport {
+  id            String   @id @default(cuid())
+  classroomId   String
+  classroom     Classroom @relation(fields: [classroomId], references: [id])
+  sessionId     String?
+  studentName   String
+  subject       String
+  startTime     String
+  endTime       String?
+  status        String   @default("active")
+  reportedBy    String
+  reportedAt    String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("classroom_usage_reports")
 }
 
 model Session {
@@ -92,32 +123,6 @@ model Session {
   teacher     User      @relation("TeacherSessions", fields: [teacherId], references: [id])
   classroomId String?
   classroom   Classroom? @relation(fields: [classroomId], references: [id])
-  payment     Payment?
 
   @@map("sessions")
-}
-
-model Payment {
-  id        String   @id @default(cuid())
-  name      String
-  capacity  Int
-  school    School   @relation(fields: [schoolId], references: [id])
-  schoolId  String
-  bookings  Booking[]
-}
-
-model Booking {
-  id                  String    @id @default(cuid())
-  title               String
-  startTime           DateTime
-  endTime             DateTime
-  status              String    // PENDING_APPROVAL, APPROVED, REJECTED
-  moderatorApproved   Boolean   @default(false)
-  developerApproved   Boolean   @default(false)
-  
-  classroom   Classroom @relation(fields: [classroomId], references: [id])
-  classroomId String
-
-  teacher     User      @relation(fields: [teacherId], references: [id])
-  teacherId   String
 }
