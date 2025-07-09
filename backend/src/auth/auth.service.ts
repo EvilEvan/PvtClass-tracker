@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -48,10 +48,23 @@ export class AuthService {
     };
   }
 
-  async createUser(email: string, firstName: string, lastName: string, password: string, role: 'TEACHER' | 'MODERATOR' | 'ADMIN', schoolId: string) {
+  async createUser(
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+    role: 'TEACHER' | 'MODERATOR' | 'ADMIN',
+    schoolId: string,
+  ) {
+    // Ensure the referenced school exists to avoid foreign key violations
+    const school = await this.prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) {
+      throw new NotFoundException(`School with ID ${schoolId} not found`);
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const user = await this.prisma.user.create({
       data: {
         email,
