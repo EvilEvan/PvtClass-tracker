@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { getApiEndpoint } from '../config/api';
 
 interface User {
   id: string;
@@ -35,7 +36,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8000/auth/users');
+      const response = await fetch(getApiEndpoint('/auth/users'));
       const data = await response.json();
       setUsers(data);
       setLoading(false);
@@ -51,7 +52,7 @@ export default function UserManagement() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/auth/create-user', {
+      const response = await fetch(getApiEndpoint('/auth/create-user'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ export default function UserManagement() {
   const handleMasterUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/auth/master-unlock', {
+      const response = await fetch(getApiEndpoint('/auth/master-unlock'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +105,7 @@ export default function UserManagement() {
   const handleDeleteUser = async (userId: string, userEmail: string) => {
     if (confirm(`Are you sure you want to delete user: ${userEmail}?`)) {
       try {
-        const response = await fetch(`http://localhost:8000/auth/users/${userId}`, {
+        const response = await fetch(getApiEndpoint(`/auth/users/${userId}`), {
           method: 'DELETE',
         });
 
@@ -149,7 +150,7 @@ export default function UserManagement() {
         updateData.password = formData.password;
       }
 
-      const response = await fetch(`http://localhost:8000/auth/users/${editingUser.id}`, {
+      const response = await fetch(getApiEndpoint(`/auth/users/${editingUser.id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +181,7 @@ export default function UserManagement() {
     if (!newPassword) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/auth/users/${userId}`, {
+      const response = await fetch(getApiEndpoint(`/auth/users/${userId}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
