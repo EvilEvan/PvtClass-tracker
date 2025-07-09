@@ -49,6 +49,15 @@ export class AuthService {
   }
 
   async createUser(email: string, firstName: string, lastName: string, password: string, role: 'TEACHER' | 'MODERATOR' | 'ADMIN', schoolId: string) {
+    // Validate that the school exists
+    const school = await this.prisma.school.findUnique({
+      where: { id: schoolId },
+    });
+    
+    if (!school) {
+      throw new Error(`School with id ${schoolId} does not exist`);
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
     
