@@ -144,7 +144,7 @@ To simplify private tutoring management through an intuitive, secure, and scalab
 
 ### 👥 User Management System
 - **Three-Tier Role System**: Admin, Moderator, Teacher with distinct permissions
-- **Master Password Override**: Snotneus69 (placeholder) for emergency access
+
 - **User Creation Interface**: Admin panel for creating and managing users
 - **Profile Management**: Comprehensive user profiles with contact information
 
@@ -316,8 +316,7 @@ npm run
 ### Authentication & Authorization
 - **Role-Based Access Control (RBAC)**: Three-tier permission system
 - **Password Hashing**: bcrypt with salt for secure password storage
-- **Master Password System**: Emergency access with configurable master password
- main
+
 - **Session Management**: Secure session handling with JWT tokens
 - **Input Validation**: Comprehensive validation using class-validator
 
