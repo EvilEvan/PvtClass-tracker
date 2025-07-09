@@ -182,7 +182,17 @@ export class StudentsService {
     return this.transformStudent(student);
   }
 
-  async create(studentData: Omit<Student, 'id'>, schoolId: string): Promise<Student> {
+  async create(studentData: Omit<Student, 'id'>, schoolId?: string): Promise<Student> {
+    // Resolve schoolId: use provided one or fall back to default school
+    let resolvedSchoolId = schoolId;
+    if (!resolvedSchoolId) {
+      let school = await this.prisma.school.findFirst();
+      if (!school) {
+        school = await this.prisma.school.create({ data: { name: 'Default School' } });
+      }
+      resolvedSchoolId = school.id;
+    }
+
     const newStudent = await this.prisma.student.create({
       data: {
         firstName: studentData.firstName,
@@ -201,7 +211,7 @@ export class StudentsService {
         addressCity: studentData.address.city,
         addressState: studentData.address.state,
         addressZipCode: studentData.address.zipCode,
-        schoolId,
+        schoolId: resolvedSchoolId,
       }
     });
     return this.transformStudent(newStudent);
