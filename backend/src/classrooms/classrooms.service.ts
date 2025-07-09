@@ -56,7 +56,12 @@ export class ClassroomsService {
             name: 'Command Bridge',
             capacity: 8,
             location: 'Level 1 - Main Deck',
-            equipment: JSON.stringify(['Interactive Whiteboard', 'Projector', 'Sound System', 'Video Conferencing']),
+            equipment: JSON.stringify([
+              'Interactive Whiteboard',
+              'Projector',
+              'Sound System',
+              'Video Conferencing',
+            ]),
             status: 'available',
             schoolId: schoolId,
           },
@@ -64,7 +69,12 @@ export class ClassroomsService {
             name: 'Jedi Council Chamber',
             capacity: 12,
             location: 'Level 2 - East Wing',
-            equipment: JSON.stringify(['Holographic Display', 'Surround Sound', 'Climate Control', 'Recording Equipment']),
+            equipment: JSON.stringify([
+              'Holographic Display',
+              'Surround Sound',
+              'Climate Control',
+              'Recording Equipment',
+            ]),
             status: 'available',
             schoolId: schoolId,
           },
@@ -72,7 +82,12 @@ export class ClassroomsService {
             name: 'Rebel Base Conference',
             capacity: 6,
             location: 'Level 1 - West Wing',
-            equipment: JSON.stringify(['Smart Board', 'Tablets', 'Wireless Presentation', 'Coffee Station']),
+            equipment: JSON.stringify([
+              'Smart Board',
+              'Tablets',
+              'Wireless Presentation',
+              'Coffee Station',
+            ]),
             status: 'available',
             schoolId: schoolId,
           },
@@ -80,11 +95,16 @@ export class ClassroomsService {
             name: 'Death Star Briefing Room',
             capacity: 15,
             location: 'Level 3 - Central',
-            equipment: JSON.stringify(['Large Screen Display', 'Microphone System', 'Document Camera', 'Lighting Controls']),
+            equipment: JSON.stringify([
+              'Large Screen Display',
+              'Microphone System',
+              'Document Camera',
+              'Lighting Controls',
+            ]),
             status: 'maintenance',
             schoolId: schoolId,
-          }
-        ]
+          },
+        ],
       });
 
       // Seed usage reports
@@ -100,7 +120,8 @@ export class ClassroomsService {
             status: 'completed',
             reportedBy: 'Obi-Wan Kenobi',
             reportedAt: '2025-01-07T08:55:00Z',
-            notes: 'Session completed successfully. Student showed excellent progress.'
+            notes:
+              'Session completed successfully. Student showed excellent progress.',
           },
           {
             classroomId: classrooms[1].id,
@@ -111,7 +132,7 @@ export class ClassroomsService {
             status: 'completed',
             reportedBy: 'Yoda',
             reportedAt: '2025-01-07T10:58:00Z',
-            notes: 'Excellent discussion on galactic governance structures.'
+            notes: 'Excellent discussion on galactic governance structures.',
           },
           {
             classroomId: classrooms[0].id,
@@ -121,9 +142,9 @@ export class ClassroomsService {
             status: 'active',
             reportedBy: 'Chewbacca',
             reportedAt: '2025-01-07T13:58:00Z',
-            notes: 'Current session in progress.'
-          }
-        ]
+            notes: 'Current session in progress.',
+          },
+        ],
       });
     }
   }
@@ -135,7 +156,7 @@ export class ClassroomsService {
       capacity: dbClassroom.capacity,
       location: dbClassroom.location,
       equipment: JSON.parse(dbClassroom.equipment),
-      status: dbClassroom.status
+      status: dbClassroom.status,
     };
 
     if (activeReport) {
@@ -146,7 +167,7 @@ export class ClassroomsService {
         subject: activeReport.subject,
         startTime: activeReport.startTime,
         endTime: activeReport.endTime || '',
-        reportedBy: activeReport.reportedBy
+        reportedBy: activeReport.reportedBy,
       };
     }
 
@@ -166,7 +187,7 @@ export class ClassroomsService {
       status: dbReport.status,
       reportedBy: dbReport.reportedBy,
       reportedAt: dbReport.reportedAt,
-      notes: dbReport.notes
+      notes: dbReport.notes,
     };
   }
 
@@ -175,13 +196,13 @@ export class ClassroomsService {
       include: {
         usageReports: {
           where: { status: 'active' },
-          take: 1
-        }
-      }
+          take: 1,
+        },
+      },
     });
 
-    return classrooms.map(classroom => 
-      this.transformClassroom(classroom, classroom.usageReports[0])
+    return classrooms.map((classroom) =>
+      this.transformClassroom(classroom, classroom.usageReports[0]),
     );
   }
 
@@ -191,9 +212,9 @@ export class ClassroomsService {
       include: {
         usageReports: {
           where: { status: 'active' },
-          take: 1
-        }
-      }
+          take: 1,
+        },
+      },
     });
 
     if (!classroom) {
@@ -203,7 +224,10 @@ export class ClassroomsService {
     return this.transformClassroom(classroom, classroom.usageReports[0]);
   }
 
-  async create(classroomData: Omit<Classroom, 'id' | 'currentSession'>, schoolId: string): Promise<Classroom> {
+  async create(
+    classroomData: Omit<Classroom, 'id' | 'currentSession'>,
+    schoolId: string,
+  ): Promise<Classroom> {
     const newClassroom = await this.prisma.classroom.create({
       data: {
         name: classroomData.name,
@@ -212,25 +236,29 @@ export class ClassroomsService {
         equipment: JSON.stringify(classroomData.equipment),
         status: classroomData.status || 'available',
         schoolId: schoolId,
-      }
+      },
     });
 
     return this.transformClassroom(newClassroom);
   }
 
-  async update(id: string, classroomData: Partial<Classroom>): Promise<Classroom> {
+  async update(
+    id: string,
+    classroomData: Partial<Classroom>,
+  ): Promise<Classroom> {
     const updateData: any = {};
-    
+
     if (classroomData.name) updateData.name = classroomData.name;
     if (classroomData.capacity) updateData.capacity = classroomData.capacity;
     if (classroomData.location) updateData.location = classroomData.location;
-    if (classroomData.equipment) updateData.equipment = JSON.stringify(classroomData.equipment);
+    if (classroomData.equipment)
+      updateData.equipment = JSON.stringify(classroomData.equipment);
     if (classroomData.status) updateData.status = classroomData.status;
 
     try {
       const updatedClassroom = await this.prisma.classroom.update({
         where: { id },
-        data: updateData
+        data: updateData,
       });
       return this.transformClassroom(updatedClassroom);
     } catch (error) {
@@ -241,16 +269,21 @@ export class ClassroomsService {
   async remove(id: string): Promise<void> {
     try {
       await this.prisma.classroom.delete({
-        where: { id }
+        where: { id },
       });
     } catch (error) {
       throw new NotFoundException(`Classroom with ID ${id} not found`);
     }
   }
 
-  async reportUsage(usageData: Omit<ClassroomUsageReport, 'id' | 'reportedAt' | 'classroomName'>): Promise<ClassroomUsageReport> {
+  async reportUsage(
+    usageData: Omit<
+      ClassroomUsageReport,
+      'id' | 'reportedAt' | 'classroomName'
+    >,
+  ): Promise<ClassroomUsageReport> {
     const classroom = await this.findOne(usageData.classroomId);
-    
+
     const newReport = await this.prisma.classroomUsageReport.create({
       data: {
         classroomId: usageData.classroomId,
@@ -262,45 +295,51 @@ export class ClassroomsService {
         status: 'active',
         reportedBy: usageData.reportedBy,
         reportedAt: new Date().toISOString(),
-        notes: usageData.notes
+        notes: usageData.notes,
       },
       include: {
-        classroom: true
-      }
+        classroom: true,
+      },
     });
-    
+
     return this.transformUsageReport(newReport);
   }
 
-  async endUsage(reportId: string, endData: { endTime: string; notes?: string }): Promise<ClassroomUsageReport> {
+  async endUsage(
+    reportId: string,
+    endData: { endTime: string; notes?: string },
+  ): Promise<ClassroomUsageReport> {
     try {
       const updatedReport = await this.prisma.classroomUsageReport.update({
         where: { id: reportId },
         data: {
           endTime: endData.endTime,
           status: 'completed',
-          notes: endData.notes
+          notes: endData.notes,
         },
         include: {
-          classroom: true
-        }
+          classroom: true,
+        },
       });
-      
+
       return this.transformUsageReport(updatedReport);
     } catch (error) {
       throw new NotFoundException(`Usage report with ID ${reportId} not found`);
     }
   }
 
-  async getUsageReports(date?: string, classroomId?: string): Promise<ClassroomUsageReport[]> {
+  async getUsageReports(
+    date?: string,
+    classroomId?: string,
+  ): Promise<ClassroomUsageReport[]> {
     const where: any = {};
-    
+
     if (date) {
       where.startTime = {
-        startsWith: date
+        startsWith: date,
       };
     }
-    
+
     if (classroomId) {
       where.classroomId = classroomId;
     }
@@ -308,13 +347,13 @@ export class ClassroomsService {
     const reports = await this.prisma.classroomUsageReport.findMany({
       where,
       include: {
-        classroom: true
+        classroom: true,
       },
       orderBy: {
-        reportedAt: 'desc'
-      }
+        reportedAt: 'desc',
+      },
     });
-    
+
     return reports.map(this.transformUsageReport);
   }
 
@@ -322,29 +361,41 @@ export class ClassroomsService {
     const classrooms = await this.prisma.classroom.findMany();
     const usageReports = await this.prisma.classroomUsageReport.findMany({
       include: {
-        classroom: true
-      }
+        classroom: true,
+      },
     });
-    
+
     const totalClassrooms = classrooms.length;
-    const availableClassrooms = classrooms.filter(c => c.status === 'available').length;
-    const inUseClassrooms = usageReports.filter(r => r.status === 'active').length;
-    const maintenanceClassrooms = classrooms.filter(c => c.status === 'maintenance').length;
-    
+    const availableClassrooms = classrooms.filter(
+      (c) => c.status === 'available',
+    ).length;
+    const inUseClassrooms = usageReports.filter(
+      (r) => r.status === 'active',
+    ).length;
+    const maintenanceClassrooms = classrooms.filter(
+      (c) => c.status === 'maintenance',
+    ).length;
+
     const today = new Date().toISOString().split('T')[0];
-    const todaysReports = usageReports.filter(r => 
-      r.startTime.startsWith(today)
+    const todaysReports = usageReports.filter((r) =>
+      r.startTime.startsWith(today),
     );
-    
-    const completedToday = todaysReports.filter(r => r.status === 'completed').length;
-    const activeToday = todaysReports.filter(r => r.status === 'active').length;
-    
+
+    const completedToday = todaysReports.filter(
+      (r) => r.status === 'completed',
+    ).length;
+    const activeToday = todaysReports.filter(
+      (r) => r.status === 'active',
+    ).length;
+
     const utilizationByClassroom: { [key: string]: number } = {};
-    classrooms.forEach(classroom => {
-      const reports = usageReports.filter(r => r.classroomId === classroom.id);
+    classrooms.forEach((classroom) => {
+      const reports = usageReports.filter(
+        (r) => r.classroomId === classroom.id,
+      );
       utilizationByClassroom[classroom.name] = reports.length;
     });
-    
+
     return {
       totalClassrooms,
       availableClassrooms,
@@ -353,13 +404,16 @@ export class ClassroomsService {
       todaysUsage: {
         completed: completedToday,
         active: activeToday,
-        total: todaysReports.length
+        total: todaysReports.length,
       },
       utilizationByClassroom,
       recentReports: usageReports
-        .sort((a, b) => new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime(),
+        )
         .slice(0, 10)
-        .map(this.transformUsageReport)
+        .map(this.transformUsageReport),
     };
   }
-} 
+}

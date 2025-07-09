@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -8,16 +8,27 @@ export class AuthService {
 
   // Master password for admin override access (configurable via environment)
   // NOTE: Set MASTER_PASSWORD environment variable for security
-  private readonly MASTER_PASSWORD = process.env.MASTER_PASSWORD || (() => {
-    console.warn('WARNING: MASTER_PASSWORD environment variable not set. Using default value.');
-    console.warn('For production, set MASTER_PASSWORD environment variable to a secure value.');
-    return 'CHANGE_ME_IN_PRODUCTION';
-  })();
+  private readonly MASTER_PASSWORD =
+    process.env.MASTER_PASSWORD ||
+    (() => {
+      console.warn(
+        'WARNING: MASTER_PASSWORD environment variable not set. Using default value.',
+      );
+      console.warn(
+        'For production, set MASTER_PASSWORD environment variable to a secure value.',
+      );
+      return 'CHANGE_ME_IN_PRODUCTION';
+    })();
 
-  async createAdminUser(email: string, firstName: string, lastName: string, password: string) {
+  async createAdminUser(
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+  ) {
     // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     let school = await this.prisma.school.findFirst();
     if (!school) {
       school = await this.prisma.school.create({
@@ -48,10 +59,25 @@ export class AuthService {
     };
   }
 
-  async createUser(email: string, firstName: string, lastName: string, password: string, role: 'TEACHER' | 'MODERATOR' | 'ADMIN', schoolId: string) {
+  async createUser(
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+    role: 'TEACHER' | 'MODERATOR' | 'ADMIN',
+    schoolId: string,
+  ) {
+    // Ensure the referenced school exists to avoid foreign key violations
+    const school = await this.prisma.school.findUnique({
+      where: { id: schoolId },
+    });
+    if (!school) {
+      throw new NotFoundException(`School with ID ${schoolId} not found`);
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const user = await this.prisma.user.create({
       data: {
         email,
@@ -82,7 +108,7 @@ export class AuthService {
     }
 
     // Check regular password
-    if (user.password && await bcrypt.compare(password, user.password)) {
+    if (user.password && (await bcrypt.compare(password, user.password))) {
       return user;
     }
 
@@ -148,4 +174,4 @@ export class AuthService {
       },
     });
   }
-} 
+}

@@ -38,7 +38,7 @@ export class SessionsService {
             firstName: true,
             lastName: true,
             email: true,
-          },  
+          },
         },
       },
       orderBy: {
@@ -73,7 +73,8 @@ export class SessionsService {
     studentId: string;
     teacherId: string;
   }) {
-    const { title, description, startTime, endTime, studentId, teacherId } = sessionData;
+    const { title, description, startTime, endTime, studentId, teacherId } =
+      sessionData;
     return this.prisma.session.create({
       data: {
         title,
@@ -81,11 +82,11 @@ export class SessionsService {
         startTime,
         endTime,
         student: {
-          connect: { id: studentId }
+          connect: { id: studentId },
         },
         teacher: {
-          connect: { id: teacherId }
-        }
+          connect: { id: teacherId },
+        },
       },
       include: {
         student: {
@@ -108,13 +109,16 @@ export class SessionsService {
     });
   }
 
-  async updateSession(sessionId: string, updateData: Partial<{
-    title: string;
-    description: string;
-    startTime: Date;
-    endTime: Date;
-    status: string;
-  }>) {
+  async updateSession(
+    sessionId: string,
+    updateData: Partial<{
+      title: string;
+      description: string;
+      startTime: Date;
+      endTime: Date;
+      status: string;
+    }>,
+  ) {
     return this.prisma.session.update({
       where: { id: sessionId },
       data: updateData,
@@ -140,7 +144,7 @@ export class SessionsService {
       where: { teacherConfirmed: true },
     });
     const withNotes = await this.prisma.session.count({
-      where: { 
+      where: {
         teacherNotes: {
           not: null,
         },
@@ -155,4 +159,4 @@ export class SessionsService {
       confirmationRate: total > 0 ? Math.round((confirmed / total) * 100) : 0,
     };
   }
-} 
+}

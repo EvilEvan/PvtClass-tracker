@@ -7,4 +7,4 @@ import { PrismaModule } from '../prisma/prisma.module';
   providers: [SessionsService],
   exports: [SessionsService],
 })
-export class SessionsModule {} 
+export class SessionsModule {}
