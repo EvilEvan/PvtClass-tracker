@@ -2,8 +2,6 @@
 
 A modern calendar-centric platform that streamlines **private tutoring** administration for solo teachers and small academies.
 
-cursor/remove-exposed-passwords-from-readme-2db2
-=======
 ## 🎯 Key Features
 
 • 📅 **Session & Calendar Management** – Create, edit and visualize student sessions on an intuitive timetable  
@@ -89,9 +87,7 @@ FRONTEND_URL=http://localhost:3001
 # Security
 JWT_SECRET=super-secret-change-me
 
-=======
 MASTER_PASSWORD=YOUR_MASTER_PASSWORD_HERE        # admin override, rotate in prod!
-main
 
 # Database (Prisma)
 DATABASE_URL="file:./dev.db"
@@ -104,7 +100,6 @@ DATABASE_URL="file:./dev.db"
 
 Frontend currently needs no env vars, but feel free to add `NEXT_PUBLIC_*` settings inside **`frontend/.env.local`**.
 
- main
 
 
 ## 📑 Table of Contents
@@ -191,7 +186,6 @@ Next.js 14 + TypeScript + React 18
 ├── API Routes
 └── Optimized Image Handling
 ```
-main
 
 ---
 
@@ -218,12 +212,10 @@ main
 - **npm**: v9+ (for workspace support)
 - **Git**: For version control
 - **VS Code**: Recommended IDE with TypeScript support
-=======
 ### Role-Based Features
 - **ADMIN**: Full system access, user creation, master password override
 - **MODERATOR**: Process management, receive notifications, system oversight
 - **TEACHER**: Simple class confirmation interface with optional notes
-main
 
 
 1. **Clone the Repository**
@@ -260,7 +252,6 @@ main
    # From project root
    npm run dev
    ```
-main
 
 ## 🎨 UI Design System
 
@@ -285,9 +276,7 @@ Professional command center interface with:
 - **API Health Check**: http://localhost:8000/health
 
 ```
-=======
 ---
-main
 
 ## 🛠️ Development Commands
 
@@ -363,7 +352,6 @@ const DynamicCalendar = dynamic(() => import('../components/Calendar'), {
 })
 ```
 
- main
 
 ### Backend Optimizations
 - **Database Optimization**: Efficient Prisma queries with proper indexing
@@ -736,7 +724,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 </div>
 
-main
 
 ## 🛡️ Security Best Practices
 
@@ -757,5 +744,4 @@ main
 > ⚠️  **Never share real passwords in issues, pull requests, or documentation.**
 
 </div>
- main
 
