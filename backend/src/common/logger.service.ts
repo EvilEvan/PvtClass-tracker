@@ -26,13 +26,18 @@ export class AppLogger implements LoggerService {
     }
   }
 
-  private formatAndLog(level: string, message: string, context?: string, trace?: string) {
+  private formatAndLog(
+    level: string,
+    message: string,
+    context?: string,
+    trace?: string,
+  ) {
     const timestamp = new Date().toISOString();
     const contextStr = context ? `[${context}]` : '';
     const formattedMessage = `${timestamp} [${level}] ${contextStr} ${message}`;
-    
+
     console.log(formattedMessage);
-    
+
     if (trace) {
       console.log(`Stack trace: ${trace}`);
     }
