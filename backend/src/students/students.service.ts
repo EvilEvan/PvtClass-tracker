@@ -199,53 +199,56 @@ export class StudentsService {
     studentData: Omit<Student, 'id'>,
     schoolId?: string,
   ): Promise<Student> {
-    // Determine the school that the new student belongs to.
-    // 1. If a schoolId is provided, ensure that it actually exists. This prevents
-    //    foreign-key violations with an invalid ID.
-    // 2. If no schoolId is provided, create (or retrieve) the "Default School"
-    //    using an atomic upsert to avoid race conditions that could otherwise
-    //    attempt to create the same record concurrently.
+    const newStudent = await this.prisma.$transaction(async (tx) => {
+      // Resolve / validate the school inside the same transaction as the student
+      // creation, guaranteeing atomicity.
 
-    let resolvedSchoolId: string;
+      let resolvedSchoolId: string;
 
-    if (schoolId) {
-      const existingSchool = await this.prisma.school.findUnique({
-        where: { id: schoolId },
-      });
-      if (!existingSchool) {
-        throw new NotFoundException(`School with ID ${schoolId} not found`);
+      if (schoolId) {
+        // Validate that the referenced school exists.
+        const existingSchool = await tx.school.findUnique({
+          where: { id: schoolId },
+        });
+        if (!existingSchool) {
+          throw new NotFoundException(`School with ID ${schoolId} not found`);
+        }
+        resolvedSchoolId = existingSchool.id;
+      } else {
+        // Atomically create (or retrieve) the "Default School".
+        const defaultSchool = await tx.school.upsert({
+          where: { name: 'Default School' },
+          update: {},
+          create: { name: 'Default School' },
+        });
+        resolvedSchoolId = defaultSchool.id;
       }
-      resolvedSchoolId = existingSchool.id;
-    } else {
-      const defaultSchool = await this.prisma.school.upsert({
-        where: { name: 'Default School' },
-        update: {},
-        create: { name: 'Default School' },
-      });
-      resolvedSchoolId = defaultSchool.id;
-    }
 
-    const newStudent = await this.prisma.student.create({
-      data: {
-        firstName: studentData.firstName,
-        lastName: studentData.lastName,
-        email: studentData.email,
-        phone: studentData.phone,
-        dateOfBirth: studentData.dateOfBirth,
-        enrollmentDate: studentData.enrollmentDate,
-        status: studentData.status,
-        subjects: JSON.stringify(studentData.subjects),
-        notes: studentData.notes,
-        emergencyContactName: studentData.emergencyContact.name,
-        emergencyContactPhone: studentData.emergencyContact.phone,
-        emergencyContactRelationship: studentData.emergencyContact.relationship,
-        addressStreet: studentData.address.street,
-        addressCity: studentData.address.city,
-        addressState: studentData.address.state,
-        addressZipCode: studentData.address.zipCode,
-        schoolId: resolvedSchoolId,
-      },
+      // Now create the student within the very same transaction.
+      return tx.student.create({
+        data: {
+          firstName: studentData.firstName,
+          lastName: studentData.lastName,
+          email: studentData.email,
+          phone: studentData.phone,
+          dateOfBirth: studentData.dateOfBirth,
+          enrollmentDate: studentData.enrollmentDate,
+          status: studentData.status,
+          subjects: JSON.stringify(studentData.subjects),
+          notes: studentData.notes,
+          emergencyContactName: studentData.emergencyContact.name,
+          emergencyContactPhone: studentData.emergencyContact.phone,
+          emergencyContactRelationship:
+            studentData.emergencyContact.relationship,
+          addressStreet: studentData.address.street,
+          addressCity: studentData.address.city,
+          addressState: studentData.address.state,
+          addressZipCode: studentData.address.zipCode,
+          schoolId: resolvedSchoolId,
+        },
+      });
     });
+
     return this.transformStudent(newStudent);
   }
 
