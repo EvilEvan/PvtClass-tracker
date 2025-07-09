@@ -199,16 +199,28 @@ export class StudentsService {
     studentData: Omit<Student, 'id'>,
     schoolId?: string,
   ): Promise<Student> {
-    // Resolve schoolId: use provided one or fall back to default school
-    let resolvedSchoolId = schoolId;
-    if (!resolvedSchoolId) {
-      let school = await this.prisma.school.findFirst();
-      if (!school) {
-        school = await this.prisma.school.create({
-          data: { name: 'Default School' },
-        });
+    // Determine the school that the new student belongs to.
+    // 1. If a schoolId is provided, ensure that it actually exists. This prevents
+    //    foreign-key violations with an invalid ID.
+    // 2. If no schoolId is provided, create (or retrieve) the "Default School"
+    //    using an atomic upsert to avoid race conditions that could otherwise
+    //    attempt to create the same record concurrently.
+
+    let resolvedSchoolId: string;
+
+    if (schoolId) {
+      const existingSchool = await this.prisma.school.findUnique({ where: { id: schoolId } });
+      if (!existingSchool) {
+        throw new NotFoundException(`School with ID ${schoolId} not found`);
       }
-      resolvedSchoolId = school.id;
+      resolvedSchoolId = existingSchool.id;
+    } else {
+      const defaultSchool = await this.prisma.school.upsert({
+        where: { name: 'Default School' },
+        update: {},
+        create: { name: 'Default School' },
+      });
+      resolvedSchoolId = defaultSchool.id;
     }
 
     const newStudent = await this.prisma.student.create({
