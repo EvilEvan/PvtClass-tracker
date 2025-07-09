@@ -199,39 +199,56 @@ export class StudentsService {
     studentData: Omit<Student, 'id'>,
     schoolId?: string,
   ): Promise<Student> {
-    // Resolve schoolId: use provided one or fall back to default school
-    let resolvedSchoolId = schoolId;
-    if (!resolvedSchoolId) {
-      let school = await this.prisma.school.findFirst();
-      if (!school) {
-        school = await this.prisma.school.create({
-          data: { name: 'Default School' },
-        });
-      }
-      resolvedSchoolId = school.id;
-    }
+    const newStudent = await this.prisma.$transaction(async (tx) => {
+      // Resolve / validate the school inside the same transaction as the student
+      // creation, guaranteeing atomicity.
 
-    const newStudent = await this.prisma.student.create({
-      data: {
-        firstName: studentData.firstName,
-        lastName: studentData.lastName,
-        email: studentData.email,
-        phone: studentData.phone,
-        dateOfBirth: studentData.dateOfBirth,
-        enrollmentDate: studentData.enrollmentDate,
-        status: studentData.status,
-        subjects: JSON.stringify(studentData.subjects),
-        notes: studentData.notes,
-        emergencyContactName: studentData.emergencyContact.name,
-        emergencyContactPhone: studentData.emergencyContact.phone,
-        emergencyContactRelationship: studentData.emergencyContact.relationship,
-        addressStreet: studentData.address.street,
-        addressCity: studentData.address.city,
-        addressState: studentData.address.state,
-        addressZipCode: studentData.address.zipCode,
-        schoolId: resolvedSchoolId,
-      },
+      let resolvedSchoolId: string;
+
+      if (schoolId) {
+        // Validate that the referenced school exists.
+        const existingSchool = await tx.school.findUnique({
+          where: { id: schoolId },
+        });
+        if (!existingSchool) {
+          throw new NotFoundException(`School with ID ${schoolId} not found`);
+        }
+        resolvedSchoolId = existingSchool.id;
+      } else {
+        // Atomically create (or retrieve) the "Default School".
+        const defaultSchool = await tx.school.upsert({
+          where: { name: 'Default School' },
+          update: {},
+          create: { name: 'Default School' },
+        });
+        resolvedSchoolId = defaultSchool.id;
+      }
+
+      // Now create the student within the very same transaction.
+      return tx.student.create({
+        data: {
+          firstName: studentData.firstName,
+          lastName: studentData.lastName,
+          email: studentData.email,
+          phone: studentData.phone,
+          dateOfBirth: studentData.dateOfBirth,
+          enrollmentDate: studentData.enrollmentDate,
+          status: studentData.status,
+          subjects: JSON.stringify(studentData.subjects),
+          notes: studentData.notes,
+          emergencyContactName: studentData.emergencyContact.name,
+          emergencyContactPhone: studentData.emergencyContact.phone,
+          emergencyContactRelationship:
+            studentData.emergencyContact.relationship,
+          addressStreet: studentData.address.street,
+          addressCity: studentData.address.city,
+          addressState: studentData.address.state,
+          addressZipCode: studentData.address.zipCode,
+          schoolId: resolvedSchoolId,
+        },
+      });
     });
+
     return this.transformStudent(newStudent);
   }
 
@@ -270,6 +287,7 @@ export class StudentsService {
       });
       return this.transformStudent(updatedStudent);
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
   }
@@ -280,6 +298,7 @@ export class StudentsService {
         where: { id },
       });
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
   }

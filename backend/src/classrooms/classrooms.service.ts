@@ -262,6 +262,8 @@ export class ClassroomsService {
       });
       return this.transformClassroom(updatedClassroom);
     } catch (error) {
+      // Log the error for debugging purposes to avoid ESLint unused-var complaint
+      console.error(error);
       throw new NotFoundException(`Classroom with ID ${id} not found`);
     }
   }
@@ -272,6 +274,7 @@ export class ClassroomsService {
         where: { id },
       });
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Classroom with ID ${id} not found`);
     }
   }
@@ -282,7 +285,8 @@ export class ClassroomsService {
       'id' | 'reportedAt' | 'classroomName'
     >,
   ): Promise<ClassroomUsageReport> {
-    const classroom = await this.findOne(usageData.classroomId);
+    // Validate that the classroom exists before creating a usage report.
+    await this.findOne(usageData.classroomId);
 
     const newReport = await this.prisma.classroomUsageReport.create({
       data: {
@@ -324,6 +328,7 @@ export class ClassroomsService {
 
       return this.transformUsageReport(updatedReport);
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Usage report with ID ${reportId} not found`);
     }
   }

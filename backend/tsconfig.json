@@ -19,8 +19,18 @@
     "noFallthroughCasesInSwitch": true,
     "types": [
       "node",
-      "jest"
+      "jest",
+      "@nestjs/common",
+      "@prisma/client"
     ],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "@nestjs/common": [
+        "node_modules/@nestjs/common"
+      ],
+      "@prisma/client": [
+        "node_modules/@prisma/client"
+      ]
+    }
   }
 }
