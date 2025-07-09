@@ -8,29 +8,6 @@ export interface Classroom {
   location: string;
   equipment: string[];
   status: string;
-  currentSession?: {
-    sessionId: string;
-    studentName: string;
-    subject: string;
-    startTime: string;
-    endTime: string;
-    reportedBy: string;
-  };
-}
-
-export interface ClassroomUsageReport {
-  id: string;
-  classroomId: string;
-  classroomName: string;
-  sessionId?: string;
-  studentName: string;
-  subject: string;
-  startTime: string;
-  endTime?: string;
-  status: string;
-  reportedBy: string;
-  reportedAt: string;
-  notes?: string;
 }
 
 @Injectable()
@@ -40,16 +17,8 @@ export class ClassroomsService {
   }
 
   private async seedData() {
-    // Check if data exists, if not, seed with sample data
     const classroomCount = await this.prisma.classroom.count();
     if (classroomCount === 0) {
-      let school = await this.prisma.school.findFirst();
-      if (!school) {
-        school = await this.prisma.school.create({
-          data: { name: 'Default School' },
-        });
-      }
-      const schoolId = school.id;
       await this.prisma.classroom.createMany({
         data: [
           {
@@ -63,7 +32,6 @@ export class ClassroomsService {
               'Video Conferencing',
             ]),
             status: 'available',
-            schoolId: schoolId,
           },
           {
             name: 'Jedi Council Chamber',
@@ -76,7 +44,6 @@ export class ClassroomsService {
               'Recording Equipment',
             ]),
             status: 'available',
-            schoolId: schoolId,
           },
           {
             name: 'Rebel Base Conference',
@@ -89,7 +56,6 @@ export class ClassroomsService {
               'Coffee Station',
             ]),
             status: 'available',
-            schoolId: schoolId,
           },
           {
             name: 'Death Star Briefing Room',
@@ -102,55 +68,14 @@ export class ClassroomsService {
               'Lighting Controls',
             ]),
             status: 'maintenance',
-            schoolId: schoolId,
-          },
-        ],
-      });
-
-      // Seed usage reports
-      const classrooms = await this.prisma.classroom.findMany();
-      await this.prisma.classroomUsageReport.createMany({
-        data: [
-          {
-            classroomId: classrooms[0].id,
-            studentName: 'Luke Skywalker',
-            subject: 'Advanced Mathematics',
-            startTime: '2025-01-07T09:00:00Z',
-            endTime: '2025-01-07T10:30:00Z',
-            status: 'completed',
-            reportedBy: 'Obi-Wan Kenobi',
-            reportedAt: '2025-01-07T08:55:00Z',
-            notes:
-              'Session completed successfully. Student showed excellent progress.',
-          },
-          {
-            classroomId: classrooms[1].id,
-            studentName: 'Leia Organa',
-            subject: 'Political Science',
-            startTime: '2025-01-07T11:00:00Z',
-            endTime: '2025-01-07T12:30:00Z',
-            status: 'completed',
-            reportedBy: 'Yoda',
-            reportedAt: '2025-01-07T10:58:00Z',
-            notes: 'Excellent discussion on galactic governance structures.',
-          },
-          {
-            classroomId: classrooms[0].id,
-            studentName: 'Han Solo',
-            subject: 'Business Strategy',
-            startTime: '2025-01-07T14:00:00Z',
-            status: 'active',
-            reportedBy: 'Chewbacca',
-            reportedAt: '2025-01-07T13:58:00Z',
-            notes: 'Current session in progress.',
           },
         ],
       });
     }
   }
 
-  private transformClassroom(dbClassroom: any, activeReport?: any): Classroom {
-    const classroom: Classroom = {
+  private transformClassroom(dbClassroom: any): Classroom {
+    return {
       id: dbClassroom.id,
       name: dbClassroom.name,
       capacity: dbClassroom.capacity,
@@ -158,76 +83,26 @@ export class ClassroomsService {
       equipment: JSON.parse(dbClassroom.equipment),
       status: dbClassroom.status,
     };
-
-    if (activeReport) {
-      classroom.status = 'in-use';
-      classroom.currentSession = {
-        sessionId: activeReport.id,
-        studentName: activeReport.studentName,
-        subject: activeReport.subject,
-        startTime: activeReport.startTime,
-        endTime: activeReport.endTime || '',
-        reportedBy: activeReport.reportedBy,
-      };
-    }
-
-    return classroom;
-  }
-
-  private transformUsageReport(dbReport: any): ClassroomUsageReport {
-    return {
-      id: dbReport.id,
-      classroomId: dbReport.classroomId,
-      classroomName: dbReport.classroom?.name || '',
-      sessionId: dbReport.sessionId,
-      studentName: dbReport.studentName,
-      subject: dbReport.subject,
-      startTime: dbReport.startTime,
-      endTime: dbReport.endTime,
-      status: dbReport.status,
-      reportedBy: dbReport.reportedBy,
-      reportedAt: dbReport.reportedAt,
-      notes: dbReport.notes,
-    };
   }
 
   async findAll(): Promise<Classroom[]> {
-    const classrooms = await this.prisma.classroom.findMany({
-      include: {
-        usageReports: {
-          where: { status: 'active' },
-          take: 1,
-        },
-      },
-    });
-
-    return classrooms.map((classroom) =>
-      this.transformClassroom(classroom, classroom.usageReports[0]),
-    );
+    const classrooms = await this.prisma.classroom.findMany();
+    return classrooms.map(this.transformClassroom);
   }
 
   async findOne(id: string): Promise<Classroom> {
     const classroom = await this.prisma.classroom.findUnique({
       where: { id },
-      include: {
-        usageReports: {
-          where: { status: 'active' },
-          take: 1,
-        },
-      },
     });
 
     if (!classroom) {
       throw new NotFoundException(`Classroom with ID ${id} not found`);
     }
 
-    return this.transformClassroom(classroom, classroom.usageReports[0]);
+    return this.transformClassroom(classroom);
   }
 
-  async create(
-    classroomData: Omit<Classroom, 'id' | 'currentSession'>,
-    schoolId: string,
-  ): Promise<Classroom> {
+  async create(classroomData: Omit<Classroom, 'id'>): Promise<Classroom> {
     const newClassroom = await this.prisma.classroom.create({
       data: {
         name: classroomData.name,
@@ -235,17 +110,13 @@ export class ClassroomsService {
         location: classroomData.location,
         equipment: JSON.stringify(classroomData.equipment),
         status: classroomData.status || 'available',
-        schoolId: schoolId,
       },
     });
 
     return this.transformClassroom(newClassroom);
   }
 
-  async update(
-    id: string,
-    classroomData: Partial<Classroom>,
-  ): Promise<Classroom> {
+  async update(id: string, classroomData: Partial<Classroom>): Promise<Classroom> {
     const updateData: any = {};
 
     if (classroomData.name) updateData.name = classroomData.name;
@@ -262,7 +133,6 @@ export class ClassroomsService {
       });
       return this.transformClassroom(updatedClassroom);
     } catch (error) {
-      // Log the error for debugging purposes to avoid ESLint unused-var complaint
       console.error(error);
       throw new NotFoundException(`Classroom with ID ${id} not found`);
     }
@@ -279,146 +149,21 @@ export class ClassroomsService {
     }
   }
 
-  async reportUsage(
-    usageData: Omit<
-      ClassroomUsageReport,
-      'id' | 'reportedAt' | 'classroomName'
-    >,
-  ): Promise<ClassroomUsageReport> {
-    // Validate that the classroom exists before creating a usage report.
-    await this.findOne(usageData.classroomId);
-
-    const newReport = await this.prisma.classroomUsageReport.create({
-      data: {
-        classroomId: usageData.classroomId,
-        sessionId: usageData.sessionId,
-        studentName: usageData.studentName,
-        subject: usageData.subject,
-        startTime: usageData.startTime,
-        endTime: usageData.endTime,
-        status: 'active',
-        reportedBy: usageData.reportedBy,
-        reportedAt: new Date().toISOString(),
-        notes: usageData.notes,
-      },
-      include: {
-        classroom: true,
-      },
-    });
-
-    return this.transformUsageReport(newReport);
-  }
-
-  async endUsage(
-    reportId: string,
-    endData: { endTime: string; notes?: string },
-  ): Promise<ClassroomUsageReport> {
-    try {
-      const updatedReport = await this.prisma.classroomUsageReport.update({
-        where: { id: reportId },
-        data: {
-          endTime: endData.endTime,
-          status: 'completed',
-          notes: endData.notes,
-        },
-        include: {
-          classroom: true,
-        },
-      });
-
-      return this.transformUsageReport(updatedReport);
-    } catch (error) {
-      console.error(error);
-      throw new NotFoundException(`Usage report with ID ${reportId} not found`);
-    }
-  }
-
-  async getUsageReports(
-    date?: string,
-    classroomId?: string,
-  ): Promise<ClassroomUsageReport[]> {
-    const where: any = {};
-
-    if (date) {
-      where.startTime = {
-        startsWith: date,
-      };
-    }
-
-    if (classroomId) {
-      where.classroomId = classroomId;
-    }
-
-    const reports = await this.prisma.classroomUsageReport.findMany({
-      where,
-      include: {
-        classroom: true,
-      },
-      orderBy: {
-        reportedAt: 'desc',
-      },
-    });
-
-    return reports.map(this.transformUsageReport);
-  }
-
   async getStats() {
     const classrooms = await this.prisma.classroom.findMany();
-    const usageReports = await this.prisma.classroomUsageReport.findMany({
-      include: {
-        classroom: true,
-      },
-    });
 
     const totalClassrooms = classrooms.length;
     const availableClassrooms = classrooms.filter(
       (c) => c.status === 'available',
     ).length;
-    const inUseClassrooms = usageReports.filter(
-      (r) => r.status === 'active',
-    ).length;
     const maintenanceClassrooms = classrooms.filter(
       (c) => c.status === 'maintenance',
     ).length;
 
-    const today = new Date().toISOString().split('T')[0];
-    const todaysReports = usageReports.filter((r) =>
-      r.startTime.startsWith(today),
-    );
-
-    const completedToday = todaysReports.filter(
-      (r) => r.status === 'completed',
-    ).length;
-    const activeToday = todaysReports.filter(
-      (r) => r.status === 'active',
-    ).length;
-
-    const utilizationByClassroom: { [key: string]: number } = {};
-    classrooms.forEach((classroom) => {
-      const reports = usageReports.filter(
-        (r) => r.classroomId === classroom.id,
-      );
-      utilizationByClassroom[classroom.name] = reports.length;
-    });
-
     return {
       totalClassrooms,
       availableClassrooms,
-      inUseClassrooms,
       maintenanceClassrooms,
-      todaysUsage: {
-        completed: completedToday,
-        active: activeToday,
-        total: todaysReports.length,
-      },
-      utilizationByClassroom,
-      recentReports: usageReports
-        .sort(
-          (a, b) =>
-            new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime(),
-        )
-        .slice(0, 10)
-        .map(this.transformUsageReport),
     };
   }
 }

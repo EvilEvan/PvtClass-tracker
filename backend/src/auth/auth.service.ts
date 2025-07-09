@@ -29,15 +29,6 @@ export class AuthService {
     // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let school = await this.prisma.school.findFirst();
-    if (!school) {
-      school = await this.prisma.school.create({
-        data: {
-          name: 'Default School',
-        },
-      });
-    }
-
     const adminUser = await this.prisma.user.create({
       data: {
         email,
@@ -45,7 +36,6 @@ export class AuthService {
         lastName,
         role: 'ADMIN',
         password: hashedPassword,
-        schoolId: school.id,
       },
     });
 
@@ -65,16 +55,7 @@ export class AuthService {
     lastName: string,
     password: string,
     role: 'TEACHER' | 'MODERATOR' | 'ADMIN',
-    schoolId: string,
   ) {
-    // Ensure the referenced school exists to avoid foreign key violations
-    const school = await this.prisma.school.findUnique({
-      where: { id: schoolId },
-    });
-    if (!school) {
-      throw new NotFoundException(`School with ID ${schoolId} not found`);
-    }
-
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -85,7 +66,6 @@ export class AuthService {
         lastName,
         role,
         password: hashedPassword,
-        schoolId,
       },
     });
 
