@@ -209,7 +209,9 @@ export class StudentsService {
     let resolvedSchoolId: string;
 
     if (schoolId) {
-      const existingSchool = await this.prisma.school.findUnique({ where: { id: schoolId } });
+      const existingSchool = await this.prisma.school.findUnique({
+        where: { id: schoolId },
+      });
       if (!existingSchool) {
         throw new NotFoundException(`School with ID ${schoolId} not found`);
       }
@@ -282,6 +284,7 @@ export class StudentsService {
       });
       return this.transformStudent(updatedStudent);
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
   }
@@ -292,6 +295,7 @@ export class StudentsService {
         where: { id },
       });
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
   }
