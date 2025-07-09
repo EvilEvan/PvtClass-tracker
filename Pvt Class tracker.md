@@ -13,7 +13,7 @@ A calendar-based private tutoring management system that tracks students, schedu
 
 ### User Role Hierarchy
 
-#### 1. Student/User Profiles (Lowest Access)
+#### 1. User Profiles (Lowest Access)
 **Permissions:**
 - View personal profile: Name, Class, School, Branch
 - Log tutoring sessions (attendance/completion only)
