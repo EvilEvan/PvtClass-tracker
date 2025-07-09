@@ -2,8 +2,8 @@
 
 A modern calendar-centric platform that streamlines **private tutoring** administration for solo teachers and small academies.
 
-cursor/remove-exposed-passwords-from-readme-2db2
-=======
+
+=======⁸
 ## 🎯 Key Features
 
 • 📅 **Session & Calendar Management** – Create, edit and visualize student sessions on an intuitive timetable  
