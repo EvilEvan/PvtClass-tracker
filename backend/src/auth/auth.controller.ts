@@ -23,7 +23,13 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    // Extract client information for enhanced security
+    const clientInfo = {
+      ip: req.ip || req.connection.remoteAddress,
+      userAgent: req.headers['user-agent']
+    };
+    
+    return this.authService.login(req.user, clientInfo);
   }
 
   @UseGuards(JwtAuthGuard)
