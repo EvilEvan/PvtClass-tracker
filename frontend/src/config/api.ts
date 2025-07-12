@@ -5,7 +5,7 @@
 
 // Get backend URL from environment variable, with fallback to localhost
 // For production, this should be set to the actual backend URL
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
 /**
  * Helper function to create API endpoint URLs
