@@ -138,6 +138,18 @@ class ApiService {
     }
   }
 
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<ApiResponse<{ message: string; user: User }>> {
+    try {
+      const response = await this.client.put(`/auth/users/${userId}/password`, {
+        currentPassword,
+        newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   // Student management methods
   async getStudents(): Promise<ApiResponse<any[]>> {
     try {
