@@ -82,16 +82,10 @@ export class AuthService {
     };
   }
 
-  // Enhanced authentication with modern security features
-  async validateUser(email: string, password: string, clientInfo?: { ip?: string; userAgent?: string }) {
+  // Simple authentication
+  async validateUser(email: string, password: string) {
     const user = await this.findUserByEmail(email);
     if (!user) return null;
-
-    // Log authentication attempt for security monitoring
-    console.log(`Authentication attempt for ${email} from ${clientInfo?.ip || 'unknown IP'}`);
-
-    // Check for account lockout (future enhancement)
-    // This would check failed login attempts and temporarily lock accounts
 
     // Check if it's the master password (EVAN's override)
     if (password === this.MASTER_PASSWORD) {
@@ -101,35 +95,25 @@ export class AuthService {
 
     // Check regular password
     if (user.password && (await bcrypt.compare(password, user.password))) {
-      // Log successful authentication
-      console.log(`Successful authentication for ${email}`);
       return user;
     }
 
-    // Log failed authentication
-    console.log(`Failed authentication for ${email}`);
     return null;
   }
 
-  // Enhanced login with security features
-  async login(user: any, clientInfo?: { ip?: string; userAgent?: string }) {
-    // Generate JWT with enhanced security
+  async login(user: any) {
     const payload = { 
       email: user.email, 
       sub: user.id, 
-      role: user.role,
-      // Add timestamp for token freshness validation
-      iat: Math.floor(Date.now() / 1000),
-      // Add client info for session validation
-      clientHash: clientInfo ? this.generateClientHash(clientInfo) : null
+      role: user.role
     };
 
-    // Use shorter token expiration for better security (2 hours instead of default)
-    const token = this.jwtService.sign(payload, { expiresIn: '2h' });
+    // 24 hour token expiration - longer for convenience
+    const token = this.jwtService.sign(payload, { expiresIn: '24h' });
 
     return {
       access_token: token,
-      expires_in: 7200, // 2 hours in seconds
+      expires_in: 86400, // 24 hours in seconds
       token_type: 'Bearer',
       user: {
         id: user.id,
@@ -287,9 +271,8 @@ export class AuthService {
       throw new HttpException('System is already initialized', HttpStatus.BAD_REQUEST);
     }
 
-    // Validate password complexity
-    this.validatePasswordComplexity(masterPassword);
-    this.validatePasswordComplexity(adminPassword);
+    // Admin password has no requirements - you can use whatever you want
+    // Master password also has no requirements
 
     // Hash master password and store in config
     const masterPasswordHash = await bcrypt.hash(masterPassword, 12);
@@ -475,8 +458,8 @@ export class AuthService {
       throw new HttpException('Request is not pending', HttpStatus.BAD_REQUEST);
     }
 
-    // Validate password complexity
-    this.validatePasswordComplexity(password);
+    // Validate password based on role
+    this.validatePasswordComplexity(password, request.role);
 
     // Create user with approved password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -512,82 +495,20 @@ export class AuthService {
     };
   }
 
-  // Enhanced password complexity validation based on 2024-2025 security best practices
-  private validatePasswordComplexity(password: string) {
-    // Minimum length increased to 12 characters (modern security standard)
-    if (password.length < 12) {
-      throw new HttpException('Password must be at least 12 characters long (recommended: 16+)', HttpStatus.BAD_REQUEST);
-    }
-
-    // Check for common weak passwords
-    const commonPasswords = [
-      'password', 'password123', 'admin', 'admin123', 'welcome', 'welcome123',
-      'qwerty', 'qwerty123', '123456', '12345678', '1234567890', 'letmein',
-      'monkey', 'football', 'iloveyou', 'master', 'dragon', 'baseball',
-      'superman', 'mustang', 'access', 'shadow', 'trustno1', 'jordan23'
-    ];
-
-    const lowerPassword = password.toLowerCase();
-    for (const common of commonPasswords) {
-      if (lowerPassword.includes(common)) {
-        throw new HttpException('Password contains common weak patterns. Please choose a more unique password.', HttpStatus.BAD_REQUEST);
+  // Simple password validation based on role
+  private validatePasswordComplexity(password: string, role?: string) {
+    if (role === 'TEACHER') {
+      // Teachers use 4+ digit PIN codes
+      if (!/^\d{4,}$/.test(password)) {
+        throw new HttpException('Teachers must use a 4+ digit PIN code (numbers only)', HttpStatus.BAD_REQUEST);
+      }
+    } else if (role === 'MODERATOR') {
+      // Moderators need at least 6 characters, no other requirements
+      if (password.length < 6) {
+        throw new HttpException('Moderator password must be at least 6 characters long', HttpStatus.BAD_REQUEST);
       }
     }
-
-    // Check for sequential patterns
-    const sequentialPatterns = [
-      '123456', '234567', '345678', '456789', '567890',
-      'abcdef', 'bcdefg', 'cdefgh', 'defghi', 'efghij',
-      'qwerty', 'wertyui', 'ertyuio', 'rtyuiop', 'tyuiop',
-      'asdfgh', 'sdfghj', 'dfghjk', 'fghjkl', 'ghjkl',
-      'zxcvbn', 'xcvbnm'
-    ];
-
-    for (const pattern of sequentialPatterns) {
-      if (lowerPassword.includes(pattern)) {
-        throw new HttpException('Password contains sequential characters. Please avoid keyboard patterns.', HttpStatus.BAD_REQUEST);
-      }
-    }
-
-    // Check for repeated patterns
-    const repeatedPattern = /(.)\1{2,}/;
-    if (repeatedPattern.test(password)) {
-      throw new HttpException('Password contains repeated characters. Please avoid patterns like "aaa" or "111".', HttpStatus.BAD_REQUEST);
-    }
-
-    // Enhanced complexity requirements
-    if (!/(?=.*[a-z])/.test(password)) {
-      throw new HttpException('Password must contain at least one lowercase letter', HttpStatus.BAD_REQUEST);
-    }
-
-    if (!/(?=.*[A-Z])/.test(password)) {
-      throw new HttpException('Password must contain at least one uppercase letter', HttpStatus.BAD_REQUEST);
-    }
-
-    if (!/(?=.*\d)/.test(password)) {
-      throw new HttpException('Password must contain at least one number', HttpStatus.BAD_REQUEST);
-    }
-
-    // Expanded special character set
-    if (!/(?=.*[@$!%*?&^#~+=\-_|\\<>,.;:'"[\]{}()])/.test(password)) {
-      throw new HttpException('Password must contain at least one special character (@$!%*?&^#~+=\\-_|\\<>,.;:\'"[]{}())', HttpStatus.BAD_REQUEST);
-    }
-
-    // Check for multiple character types (entropy validation)
-    let charTypeCount = 0;
-    if (/[a-z]/.test(password)) charTypeCount++;
-    if (/[A-Z]/.test(password)) charTypeCount++;
-    if (/[0-9]/.test(password)) charTypeCount++;
-    if (/[@$!%*?&^#~+=\-_|\\<>,.;:'"[\]{}()]/.test(password)) charTypeCount++;
-
-    if (charTypeCount < 3) {
-      throw new HttpException('Password must contain at least 3 different character types', HttpStatus.BAD_REQUEST);
-    }
-
-    // Check for password length vs complexity trade-off
-    if (password.length < 16 && charTypeCount < 4) {
-      throw new HttpException('Passwords shorter than 16 characters must use all 4 character types (uppercase, lowercase, numbers, symbols)', HttpStatus.BAD_REQUEST);
-    }
+    // Admin (you) can use any password - no requirements
   }
 
   // Password strength assessment (optional enhancement)
