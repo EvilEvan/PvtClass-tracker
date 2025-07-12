@@ -60,14 +60,17 @@ npm install --workspaces
 npm run db:push            # defined in backend/package.json
 npm run db:seed            # optional demo data
 
-# Start API & Web in parallel (ports 8000 & 3001)
+# Start API & Web in parallel (ports 3001 & 3002)
 npm run dev                # root script
 ```
 
 ### Access Points
-• http://localhost:3001 – Next.js frontend  
-• http://localhost:8000 – NestJS API  
-• http://localhost:8000/health – API health-check  
+• http://localhost:3002 – Next.js frontend  
+• http://localhost:3001 – NestJS API  
+• http://localhost:3001/auth/check-admin – API health-check  
+
+> **⚠️ IMPORTANT**: Port 3000 is reserved/taken by another service. 
+> Backend runs on port 3001, Frontend on port 3002.  
 
 Hot-reloading is enabled on code changes for **both** services.
 
