@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
   // Master password for admin override access (configurable via environment)
   // NOTE: Set MASTER_PASSWORD environment variable for security
@@ -153,5 +157,24 @@ export class AuthService {
         lastName: true,
       },
     });
+  }
+
+  async login(user: any) {
+    const payload = { email: user.email, sub: user.id, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+    };
+  }
+
+  async createToken(user: any) {
+    const payload = { email: user.email, sub: user.id, role: user.role };
+    return this.jwtService.sign(payload);
   }
 }

@@ -116,7 +116,10 @@ export class ClassroomsService {
     return this.transformClassroom(newClassroom);
   }
 
-  async update(id: string, classroomData: Partial<Classroom>): Promise<Classroom> {
+  async update(
+    id: string,
+    classroomData: Partial<Classroom>,
+  ): Promise<Classroom> {
     const updateData: any = {};
 
     if (classroomData.name) updateData.name = classroomData.name;
