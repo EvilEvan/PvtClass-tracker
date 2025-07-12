@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '../components/UI/Layout';
 import { DashboardCard } from '../components/Dashboard/DashboardCard';
+import { getApiUrl, API_ENDPOINTS } from '../config/api';
 
 export default function Home() {
   const [adminExists, setAdminExists] = useState(false);
@@ -8,7 +9,7 @@ export default function Home() {
 
   useEffect(() => {
     // Check if admin exists
-    fetch('http://localhost:8000/auth/check-admin')
+    fetch(getApiUrl(API_ENDPOINTS.CHECK_ADMIN))
       .then(res => res.json())
       .then(data => {
         setAdminExists(data.adminExists);

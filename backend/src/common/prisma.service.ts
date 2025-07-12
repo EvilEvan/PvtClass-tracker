@@ -6,6 +6,9 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  // Dynamic model delegates (school, student, etc.) added by Prisma at runtime.
+  [key: string]: any;
+
   async onModuleInit() {
     await this.$connect();
   }

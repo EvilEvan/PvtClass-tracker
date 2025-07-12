@@ -41,13 +41,6 @@ export class StudentsService {
   private async seedData() {
     const count = await this.prisma.student.count();
     if (count === 0) {
-      let school = await this.prisma.school.findFirst();
-      if (!school) {
-        school = await this.prisma.school.create({
-          data: { name: 'Default School' },
-        });
-      }
-      const schoolId = school.id;
       await this.prisma.student.createMany({
         data: [
           {
@@ -72,7 +65,6 @@ export class StudentsService {
             addressCity: 'Desert Springs',
             addressState: 'AZ',
             addressZipCode: '85001',
-            schoolId,
           },
           {
             firstName: 'Leia',
@@ -96,7 +88,6 @@ export class StudentsService {
             addressCity: 'Capital City',
             addressState: 'DC',
             addressZipCode: '20001',
-            schoolId,
           },
           {
             firstName: 'Han',
@@ -116,7 +107,6 @@ export class StudentsService {
             addressCity: 'Corellia',
             addressState: 'TX',
             addressZipCode: '75001',
-            schoolId,
           },
         ],
       });
@@ -195,22 +185,7 @@ export class StudentsService {
     return this.transformStudent(student);
   }
 
-  async create(
-    studentData: Omit<Student, 'id'>,
-    schoolId?: string,
-  ): Promise<Student> {
-    // Resolve schoolId: use provided one or fall back to default school
-    let resolvedSchoolId = schoolId;
-    if (!resolvedSchoolId) {
-      let school = await this.prisma.school.findFirst();
-      if (!school) {
-        school = await this.prisma.school.create({
-          data: { name: 'Default School' },
-        });
-      }
-      resolvedSchoolId = school.id;
-    }
-
+  async create(studentData: Omit<Student, 'id'>): Promise<Student> {
     const newStudent = await this.prisma.student.create({
       data: {
         firstName: studentData.firstName,
@@ -229,9 +204,9 @@ export class StudentsService {
         addressCity: studentData.address.city,
         addressState: studentData.address.state,
         addressZipCode: studentData.address.zipCode,
-        schoolId: resolvedSchoolId,
       },
     });
+
     return this.transformStudent(newStudent);
   }
 
@@ -270,6 +245,7 @@ export class StudentsService {
       });
       return this.transformStudent(updatedStudent);
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
   }
@@ -280,6 +256,7 @@ export class StudentsService {
         where: { id },
       });
     } catch (error) {
+      console.error(error);
       throw new NotFoundException(`Student with ID ${id} not found`);
     }
   }
@@ -317,9 +294,8 @@ export class StudentsService {
     };
   }
 
-  // Moderator-specific methods for teacher assignments
+  // Teacher assignment methods
   async assignTeacher(studentId: string, teacherId: string): Promise<Student> {
-    // Verify teacher exists and has TEACHER role
     const teacher = await this.prisma.user.findUnique({
       where: { id: teacherId },
     });
