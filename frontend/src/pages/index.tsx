@@ -1,53 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { Layout } from '../components/UI/Layout';
-import { DashboardCard } from '../components/Dashboard/DashboardCard';
-import { getApiUrl, API_ENDPOINTS } from '../config/api';
 
 export default function Home() {
-  const [adminExists, setAdminExists] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    // Check if admin exists
-    fetch(getApiUrl(API_ENDPOINTS.CHECK_ADMIN))
-      .then(res => res.json())
-      .then(data => {
-        setAdminExists(data.adminExists);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+    // Check if user is authenticated
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      // Redirect to login selection page
+      router.push('/login-select');
+    } else {
+      // User is authenticated, redirect to dashboard
+      router.push('/dashboard');
+    }
+  }, [router]);
 
-  if (loading) {
-    return (
-      <Layout title="Private Class Tracker" description="Loading..." showHeader={false}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          height: '50vh'
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '60px',
-              height: '60px',
-              border: '3px solid #00d4ff',
-              borderTop: '3px solid transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 20px'
-            }}></div>
-            <p style={{ fontSize: '1.2rem' }}>Connecting to the network...</p>
-          </div>
+  return (
+    <Layout title="Private Class Tracker" description="Loading..." showHeader={false}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '50vh'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '3px solid #00d4ff',
+            borderTop: '3px solid transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p style={{ fontSize: '1.2rem' }}>Redirecting...</p>
         </div>
-        <style jsx>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
+      </div>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </Layout>
+  );
+}
       </Layout>
     );
   }

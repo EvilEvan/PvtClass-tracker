@@ -10,6 +10,7 @@ import {
   Delete,
   Param,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -146,6 +147,32 @@ export class AuthController {
       throw new HttpException(
         'Failed to fetch teachers',
         HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('users/:id/password')
+  async changePassword(@Param('id') userId: string, @Body() body: { currentPassword: string; newPassword: string }) {
+    try {
+      const { currentPassword, newPassword } = body;
+      
+      if (!currentPassword || !newPassword) {
+        throw new HttpException(
+          'Current password and new password are required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const updatedUser = await this.authService.changePassword(userId, currentPassword, newPassword);
+      return { 
+        message: 'Password changed successfully',
+        user: updatedUser
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to change password',
+        HttpStatus.BAD_REQUEST,
       );
     }
   }

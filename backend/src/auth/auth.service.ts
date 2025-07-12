@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -169,6 +169,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        passwordChanged: user.passwordChanged,
       },
     };
   }
@@ -176,5 +177,43 @@ export class AuthService {
   async createToken(user: any) {
     const payload = { email: user.email, sub: user.id, role: user.role };
     return this.jwtService.sign(payload);
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    // Find the user
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if current password is correct (skip if using master password)
+    if (currentPassword !== this.MASTER_PASSWORD) {
+      if (!user.password || !(await bcrypt.compare(currentPassword, user.password))) {
+        throw new HttpException('Current password is incorrect', HttpStatus.UNAUTHORIZED);
+      }
+    }
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user with new password and set passwordChanged to true
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedNewPassword,
+        passwordChanged: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        passwordChanged: true,
+      },
+    });
   }
 }

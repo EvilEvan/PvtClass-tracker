@@ -17,6 +17,24 @@ export default function LoginPage() {
   const [showMasterPassword, setShowMasterPassword] = useState(false);
   const [masterPassword, setMasterPassword] = useState('');
   const router = useRouter();
+  const { role } = router.query;
+
+  // Determine the title based on role
+  const getTitle = () => {
+    switch (role) {
+      case 'Moderator':
+        return 'Moderator Login';
+      case 'Teacher':
+        return 'Teacher Login';
+      case 'Admin':
+        return 'Developer Platform Access';
+      default:
+        return 'Login';
+    }
+  };
+
+  // Determine if master password should be shown for admin
+  const showMasterOption = role === 'Admin';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,10 +91,10 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Private Class Tracker
+            {getTitle()}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to your account
+            {role === 'Admin' ? 'Developer access required' : 'Sign in to your account'}
           </p>
         </div>
 
@@ -130,12 +148,21 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-between">
+              {showMasterOption && (
+                <button
+                  type="button"
+                  onClick={() => setShowMasterPassword(true)}
+                  className="text-sm text-indigo-600 hover:text-indigo-500"
+                >
+                  Need admin access?
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => setShowMasterPassword(true)}
-                className="text-sm text-indigo-600 hover:text-indigo-500"
+                onClick={() => router.push('/login-select')}
+                className="text-sm text-gray-600 hover:text-gray-500"
               >
-                Need admin access?
+                Back to role selection
               </button>
             </div>
           </form>
