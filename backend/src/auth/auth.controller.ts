@@ -176,4 +176,151 @@ export class AuthController {
       );
     }
   }
+
+  // Admin Setup Wizard - Check if system is initialized
+  @Get('system-status')
+  async getSystemStatus() {
+    try {
+      const status = await this.authService.getSystemStatus();
+      return status;
+    } catch (error) {
+      throw new HttpException(
+        'Failed to check system status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // Admin Setup Wizard - Initialize system with master password
+  @Post('initialize-system')
+  async initializeSystem(@Body() body: { masterPassword: string; adminEmail: string; adminFirstName: string; adminLastName: string; adminPassword: string }) {
+    try {
+      const { masterPassword, adminEmail, adminFirstName, adminLastName, adminPassword } = body;
+      
+      if (!masterPassword || !adminEmail || !adminFirstName || !adminLastName || !adminPassword) {
+        throw new HttpException(
+          'All fields are required for system initialization',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const result = await this.authService.initializeSystem(masterPassword, adminEmail, adminFirstName, adminLastName, adminPassword);
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to initialize system',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // Role-based user creation - only for admin and moderators
+  @UseGuards(JwtAuthGuard)
+  @Post('create-user-by-role')
+  async createUserByRole(@Request() req, @Body() createUserDto: any) {
+    try {
+      const { email, firstName, lastName, role, requestorPassword } = createUserDto;
+      
+      if (!email || !firstName || !lastName || !role || !requestorPassword) {
+        throw new HttpException(
+          'All fields including requestor password are required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Check if user has permission to create users
+      const result = await this.authService.createUserByRole(
+        req.user.id,
+        req.user.role,
+        email,
+        firstName,
+        lastName,
+        role,
+        requestorPassword
+      );
+      
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to create user',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // Request password creation - for new users
+  @Post('request-password-creation')
+  async requestPasswordCreation(@Body() body: { email: string; firstName: string; lastName: string; role: string; reason: string }) {
+    try {
+      const { email, firstName, lastName, role, reason } = body;
+      
+      if (!email || !firstName || !lastName || !role || !reason) {
+        throw new HttpException(
+          'All fields are required for password creation request',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const result = await this.authService.requestPasswordCreation(email, firstName, lastName, role, reason);
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to request password creation',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // Get pending password requests - admin only
+  @UseGuards(JwtAuthGuard)
+  @Get('pending-password-requests')
+  async getPendingPasswordRequests(@Request() req) {
+    try {
+      if (req.user.role !== 'ADMIN') {
+        throw new HttpException(
+          'Only administrators can view pending password requests',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const requests = await this.authService.getPendingPasswordRequests();
+      return requests;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to fetch pending password requests',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // Approve password request - admin only
+  @UseGuards(JwtAuthGuard)
+  @Post('approve-password-request/:id')
+  async approvePasswordRequest(@Request() req, @Param('id') requestId: string, @Body() body: { password: string; masterPassword: string }) {
+    try {
+      if (req.user.role !== 'ADMIN') {
+        throw new HttpException(
+          'Only administrators can approve password requests',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const { password, masterPassword } = body;
+      
+      if (!password || !masterPassword) {
+        throw new HttpException(
+          'Password and master password are required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const result = await this.authService.approvePasswordRequest(requestId, password, masterPassword);
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to approve password request',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

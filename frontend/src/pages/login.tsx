@@ -61,8 +61,14 @@ export default function LoginPage() {
       localStorage.setItem('authToken', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
-      // Redirect to dashboard
-      router.push('/dashboard');
+      // Check if user needs to change password
+      if (!response.user.passwordChanged) {
+        setCurrentUser(response.user);
+        setShowPasswordModal(true);
+      } else {
+        // Redirect to dashboard
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -89,6 +95,16 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePasswordChangeSuccess = () => {
+    setShowPasswordModal(false);
+    setShowInfoModal(true);
+  };
+
+  const handleInfoModalClose = () => {
+    setShowInfoModal(false);
+    router.push('/dashboard');
   };
 
   return (
@@ -204,4 +220,33 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowMasterPassword(false)}
-                className="flex-1 py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:rin
+                className="flex-1 py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Back to Login
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Password Change Modal */}
+      {currentUser && (
+        <PasswordChangeModal
+          isOpen={showPasswordModal}
+          onClose={() => {}} // Prevent closing for first-time users
+          onSuccess={handlePasswordChangeSuccess}
+          userId={currentUser.id}
+          isFirstTime={true}
+        />
+      )}
+
+      {/* Information Modal */}
+      <InfoModal
+        isOpen={showInfoModal}
+        onClose={handleInfoModalClose}
+        title="Password Changed Successfully"
+        message="Your password has been changed successfully. You can change your password anytime from your profile page."
+      />
+    </div>
+  );
+}
